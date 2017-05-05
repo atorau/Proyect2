@@ -11,8 +11,8 @@ const passport = require('passport');
 const flash = require('flash');
 
 
-var index = require('./routes/index');
-var users = require('./routes/users');
+var index = require('./routes/siteController');
+var users = require('./routes/authController');
 
 var app = express();
 
@@ -44,7 +44,7 @@ app.use(session({
 app.use(flash());
 
 app.use('/', index);
-app.use('/users', users);
+app.use('/intranet/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
