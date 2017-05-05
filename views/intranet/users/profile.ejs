@@ -1,0 +1,38 @@
+<ul>
+  <%if(typeof(user)!=='undefined'){%>
+    <li>
+      <p>
+        <%=user.name%>
+      </p>
+    </li>
+    <li>
+      <p>
+        <%=user.username%>
+      </p>
+    </li>
+    <li>
+      <p>
+        <%=user.familyName%>
+      </p>
+    </li>
+    <li>
+      <p>
+        <%=user.role%>
+      </p>
+    </li>
+    <%}%>
+</ul>
+
+<%if(user.username === currentUser.username || currentUser.role === 'Boss'){ %>
+  <p class="account-message">
+    <a href="/<%=user._id%>/edit">Edit</a>
+  </p>
+  <%}%>
+
+    <p class="account-message">
+      <a href="/">Home</a>
+    </p>
+
+    <p class="account-message">
+      <a href="/user-list">User List</a>
+    </p>
