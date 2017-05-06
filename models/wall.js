@@ -12,7 +12,10 @@ const wallSchema = new Schema({
     enum: ['GLOBAL','USER'],
     default: 'USER'
   },
-  messages: [{ type: Schema.Types.ObjectId, ref: "Message" }],
+  messages: [{
+    type: Schema.Types.ObjectId,
+    ref: "Message"
+  }]
 });
 
 const Wall = mongoose.model("Wall", wallSchema);

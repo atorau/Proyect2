@@ -36,9 +36,22 @@ Wall.create(globalWall, (err, wall) => {
           if (err) {
             throw err;
           }
-          console.log(messages);
+          console.log("Messages created",messages);
           user.messages.push(...messages);
-          console.log("user",user);
+          user.save((err,updatedUser)=>{
+            if(err){
+              throw err;
+            }
+              console.log("User pushed",user);
+          });
+
+          wall.messages.push(...messages);
+          wall.save((err,updatedWall)=>{
+            if(err){
+              throw err;
+            }
+            console.log("wall",wall);
+          });    
           Message.find({messageType:'GLOBAL'}, (err,messages)=>{
             console.log("messages busqueda",messages);
           });

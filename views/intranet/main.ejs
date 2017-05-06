@@ -9,9 +9,6 @@
           <a href="/<%=user._id%>/show">
             <%=user.username%>
           </a>
-          <!-- <%if(currentUser.role ==='Boss' && user.role!=='Boss'){%>
-          <a href="/<%=user._id%>/delete">Delete</a> -->
-          <%}%>
         </p>
       </li>
       <%})%>
@@ -30,13 +27,8 @@
       <% wall.messages.forEach((message)=>{%>
         <li>
           <p>
-            <!-- <a href="/<%=wall.messages.owner_id%>/show"> -->
-            <%=message%>
+            <%=message.message%>
               </a>
-              <!-- <%if(currentUser.role ==='Boss' && user.role!=='Boss'){%>
-            <a href="/<%=user._id%>/delete">Delete</a> -->
-
-              <!-- <%}%> -->
           </p>
         </li>
         <%})%>
