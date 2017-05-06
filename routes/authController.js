@@ -18,13 +18,13 @@ const passport = require("passport");
 const auth = require('../helpers/auth-helpers');
 
 
-authRoutes.get("/login", (req, res, next) => {
+authRoutes.get("/login", auth.ifAlreadyLoggedIn('/main'), (req, res, next) => {
   res.render("intranet/auth/login", {
     "message": req.flash("error")
   });
 });
 
-authRoutes.post("/login", passport.authenticate("local", {
+authRoutes.post("/login", passport.authenticate("local",{
   successRedirect: "/main",
   failureRedirect: "/login",
   failureFlash: true,
