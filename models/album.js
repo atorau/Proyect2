@@ -15,12 +15,10 @@ const albumSchema = new Schema({
         type: Schema.Types.ObjectID,
         ref: "User"
       },
-      {
-        timestamps: {
-          createdAt: "created_at",
-          updatedAt: "updated_at"
-        }
-
+      timestamps: {
+        createdAt: "created_at",
+        updatedAt: "updated_at"
+      }
       });
 
     var Album = mongoose.model("Album", albumSchema); module.exports = Album;

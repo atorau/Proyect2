@@ -15,7 +15,6 @@ const pictureSchema = new Schema({
     type: Schema.Types.ObjectID,
     ref: "User"
   },
-}, {
   timestamps: {
     createdAt: "created_at",
     updatedAt: "updated_at"
