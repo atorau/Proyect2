@@ -6,6 +6,8 @@ const auth = require('../helpers/auth-helpers');
 const User = require("../models/user");
 // Wall model
 const Wall = require("../models/wall");
+// Message model
+const Message = require("../models/message");
 
 /* GET home page. */
 siteController.get('/', (req, res, next) => {
@@ -33,14 +35,16 @@ siteController.get('/intranet', auth.ensureLoggedIn('/login'), (req, res, next) 
 });
 
 siteController.get('/main', auth.ensureLoggedIn('/login'), (req, res, next) => {
-  Wall.find({wallType: 'GLOBAL'},(err,wall)=>{
+  Wall.find({wallType: 'GLOBAL'}).populate('messages').exec((err,wall)=>{
     if (err) {
       next(err);
     }
     else {
+      console.log("********************************");
+      console.log("wall",wall[0]);
       User.find({},(err,users)=>{
         console.log("users",users);
-        res.render('intranet/main',{users:users, wall:wall});
+        res.render('intranet/main',{users:users, wall:wall[0]});
       });
     }
   });
