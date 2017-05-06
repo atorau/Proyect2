@@ -1,1 +1,23 @@
 <h1>una mierda pa tu culo</h1>
+
+
+<ul>
+  <%if(typeof(users)!=='undefined'){%>
+    <% users.forEach((user)=>{%>
+      <li>
+        <p>
+          <a href="/<%=user._id%>/show">
+            <%=user.username%>
+          </a>
+          <!-- <%if(currentUser.role ==='Boss' && user.role!=='Boss'){%>
+          <a href="/<%=user._id%>/delete">Delete</a> -->
+          <%}%>
+        </p>
+      </li>
+      <%})%>
+        <%}%>
+</ul>
+
+<p class="account-message">
+  <a href="/">Home</a>
+</p>
