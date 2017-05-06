@@ -26,16 +26,15 @@ siteController.get('/history', (req, res, next) => {
 
 
 siteController.get('/intranet', auth.ensureLoggedIn('/login'), (req, res, next) => {
-  User.find({},(err,users)=>{
-    res.render('intranet/main',{users});
-  });
+
 
 });
 
 siteController.get('/main', auth.ensureLoggedIn('/login'), (req, res, next) => {
-
-
-  res.render('intranet/main');
+  User.find({},(err,users)=>{
+    console.log("users",users);
+    res.render('intranet/main',{users: users});
+  });
 });
 
 module.exports = siteController;
