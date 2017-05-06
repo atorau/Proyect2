@@ -2,6 +2,9 @@ const express = require("express");
 const siteController = express.Router();
 const auth = require('../helpers/auth-helpers');
 
+// User model
+const User = require("../models/user");
+
 /* GET home page. */
 siteController.get('/', (req, res, next) => {
   res.render('index', {
@@ -23,10 +26,15 @@ siteController.get('/history', (req, res, next) => {
 
 
 siteController.get('/intranet', auth.ensureLoggedIn('/login'), (req, res, next) => {
-  res.render('intranet/main');
+  User.find({},(err,users)=>{
+    res.render('intranet/main',{users});
+  });
+
 });
 
 siteController.get('/main', auth.ensureLoggedIn('/login'), (req, res, next) => {
+
+
   res.render('intranet/main');
 });
 
