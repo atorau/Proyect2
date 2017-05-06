@@ -9,7 +9,8 @@ const wallSchema = new Schema({
   },
   wallType : {
     type: String,
-    enum: ['GLOBAL','USER']
+    enum: ['GLOBAL','USER'],
+    default: 'USER'
   },
   messages: [{ type: Schema.Types.ObjectId, ref: "Message" }],
 });
