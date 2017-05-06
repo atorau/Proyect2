@@ -28,4 +28,13 @@ module.exports = {
       }
     };
   },
+  ifAlreadyLoggedIn: (redirectPath) => {
+    return (req, res, next) => {
+      if (req.isAuthenticated()) {
+        res.redirect(redirectPath);
+      } else {
+        next();
+      }
+    };
+  },
 };
