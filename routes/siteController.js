@@ -35,19 +35,21 @@ siteController.get('/intranet', auth.ensureLoggedIn('/login'), (req, res, next) 
 });
 
 siteController.get('/main', auth.ensureLoggedIn('/login'), (req, res, next) => {
-  Wall.find({wallType: 'GLOBAL'}).populate('messages').exec((err,wall)=>{
+
+  Wall.findOne({wallType: 'GLOBAL'}).populate('messages').exec((err,wall)=>{
     if (err) {
       next(err);
     }
     else {
       console.log("********************************");
-      console.log("wall",wall[0]);
+      console.log("wall",wall);
       User.find({},(err,users)=>{
         console.log("users",users);
-        res.render('intranet/main',{users:users, wall:wall[0]});
+        res.render('intranet/main',{users, wall});
       });
     }
   });
+
 });
 
 module.exports = siteController;
