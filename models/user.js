@@ -11,46 +11,45 @@ const userSchema = new Schema({
     ubication: String,
     addess: String,
     pic_path: String,
-    pic_name: String
-  },
+    pic_name: String,
 
-  role: {
-    type: String,
-    enum: ['ADMIN', 'USER'],
-    default: 'USER'
-  },
+    role: {
+      type: String,
+      enum: ['ADMIN', 'USER'],
+      default: 'USER'
+    },
 
-  routes: [{
-    type: Schema.Types.ObjectID,
-    ref: "Route"
-  }],
+    routes: [{
+      type: Schema.Types.ObjectID,
+      ref: "Route"
+    }],
 
-  albumns: [{
-    type: Schema.Types.ObjectID,
-    ref: "Albumn"
-  }],
+    albumns: [{
+      type: Schema.Types.ObjectID,
+      ref: "Albumn"
+    }],
 
-  tracks: [{
-    type: Schema.Types.ObjectID,
-    ref: "Track"
-  }],
+    tracks: [{
+      type: Schema.Types.ObjectID,
+      ref: "Track"
+    }],
 
-  // comments: [[type : Schema.Types.ObjectID, ref: "Message"]],
+    // comments: [[type : Schema.Types.ObjectID, ref: "Message"]],
 
-  messages: [{
-    type: Schema.Types.ObjectID,
-    ref: "Message"
-  }],
+    messages: [{
+      type: Schema.Types.ObjectID,
+      ref: "Message"
+    }],
 
-  conversations: [{
-    type: SchemaTypes.ObjectyID,
-    ref: "Conversations"
-  }],
+    conversations: [{
+      type: SchemaTypes.ObjectyID,
+      ref: "Conversations"
+    }],
 
-  wall: {
-    type: Schema.Types.ObjectId,
-    ref: "Wall"
-  }, {
+    wall: {
+      type: Schema.Types.ObjectId,
+      ref: "Wall"
+    },
     timestamps: {
       createdAt: "created_at",
       updatedAt: "updated_at"
