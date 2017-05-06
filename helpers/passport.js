@@ -34,6 +34,8 @@ passport.use(new LocalStrategy({
       });
     }
     if (!bcrypt.compareSync(password, user.password)) {
+      console.log("password",password);
+      console.log("user.password",user.password);
       return next(null, false, {
         message: "Incorrect password"
       });

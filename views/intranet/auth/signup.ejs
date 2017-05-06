@@ -1,0 +1,43 @@
+<!-- views/auth/signup.ejs -->
+<h2>Create User</h2>
+
+<form action="/signup" method="POST" id="form-container">
+  <label for="username">Username</label>
+  <input id="username" type="text" name="username" placeholder="JonSnow">
+  <br><br>
+  <label for="name">Name</label>
+  <input id="name" type="text" name="name" placeholder="Jon">
+  <br><br>
+  <label for="lastName">Last Name</label>
+  <input id="lastName" type="text" name="lastName" placeholder="Snow">
+  <br><br>
+  <label for="email">Email</label>
+  <input id="email" type="text" name="email" placeholder="marica@pussy.com">
+  <br><br>
+  <label for="password">Password</label>
+  <input id="password" type="password" name="password" placeholder="Your password">
+  <br><br>
+  <label for="ubication">Ubication</label>
+  <input id="ubication" type="text" name="ubication" placeholder="Colloto">
+  <br><br>
+  <label for="address">Address</label>
+  <input id="address" type="text" name="address" placeholder="C/Principe de Asturies">
+  <br><br>
+
+  <% if (typeof message !== "undefined") { %>
+    <div class="error-message">
+      <%= message %>
+    </div>
+    <% } %>
+      <br><br>
+
+      <button>Create account</button>
+
+      <p class="account-message">
+        <a href="/">Home</a>
+      </p>
+
+      <p class="account-message">
+        <a href="/logout">Logout</a>
+      </p>
+</form>

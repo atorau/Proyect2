@@ -12,7 +12,7 @@ const userSchema = new Schema({
     addess: String,
     pic_path: String,
     pic_name: String,
-
+    //
     role: {
       type: String,
       enum: ['ADMIN', 'USER'],
@@ -20,40 +20,40 @@ const userSchema = new Schema({
     },
 
     routes: [{
-      type: Schema.Types.ObjectID,
+      type: Schema.Types.ObjectId,
       ref: "Route"
     }],
 
     albumns: [{
-      type: Schema.Types.ObjectID,
+      type: Schema.Types.ObjectId,
       ref: "Albumn"
     }],
 
     tracks: [{
-      type: Schema.Types.ObjectID,
+      type: Schema.Types.ObjectId,
       ref: "Track"
     }],
 
-    // comments: [[type : Schema.Types.ObjectID, ref: "Message"]],
+    // comments: [[type : Schema.Types.ObjectId, ref: "Message"]],
 
     messages: [{
-      type: Schema.Types.ObjectID,
+      type: Schema.Types.ObjectId,
       ref: "Message"
     }],
 
     conversations: [{
-      type: SchemaTypes.ObjectyID,
+      type: Schema.Types.ObjectId,
       ref: "Conversations"
     }],
 
     wall: {
       type: Schema.Types.ObjectId,
       ref: "Wall"
-    },
-    timestamps: {
-      createdAt: "created_at",
-      updatedAt: "updated_at"
     }
+  },{
+    timestamps: {
+    createdAt: "created_at",
+    updatedAt: "updated_at"}
   });
 
 const User = mongoose.model("User", userSchema);
