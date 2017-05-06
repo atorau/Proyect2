@@ -1,22 +1,24 @@
 const express = require('express');
 const exoressLayouts = require('express-ejs-layouts');
 const mongoose = require('mongoose');
-const session = require("express-session");
+
 const path = require('path');
 const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const passport = require('passport');
-const flash = require('flash');
 
 
-var index = require('./routes/index');
-var users = require('./routes/users');
+const session = require("express-session");
+const flash = require("connect-flash");
+const auth = require('./helpers/auth-helpers');
+const passport = require('./helpers/passport');
+
+
+var siteController = require('./routes/siteController');
+var authController = require('./routes/authController');
 
 var app = express();
-
-
 
 //Mongoose configuration
 mongoose.connect("mongodb://localhost:27017/proyecto-ironhack");
@@ -43,8 +45,13 @@ app.use(session({
 
 app.use(flash());
 
-app.use('/', index);
-app.use('/users', users);
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(auth.setCurrentUser);
+
+app.use('/', siteController);
+app.use('/', authController);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
