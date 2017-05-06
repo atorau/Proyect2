@@ -4,10 +4,8 @@ const Schema = mongoose.Schema;
 const productSchema = new Schema({
   name: String,
   price: String,
-  picture_id: {
-    type: Schema.Types.ObjectID,
-    ref: "Picture"
-  }
+  pic_path: String,
+  pic_name: String,
 });
 
 var Product = mongoose.model("Product", productSchema);

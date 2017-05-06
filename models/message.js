@@ -18,11 +18,10 @@ const messageSchema = new Schema({
     type: String,
     enum: ['GLOBAL', 'WALL','CONVERSATION','ROUTE'],
     default: 'GLOBAL'
-  },
-  timestamps: {
-    createdAt: "created_at",
-    updatedAt: "updated_at"
   }
+},{timestamps: {
+  createdAt: "created_at",
+  updatedAt: "updated_at"}
 });
 
 const Message = mongoose.model("Message", messageSchema);

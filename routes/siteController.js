@@ -1,14 +1,6 @@
 const express = require("express");
 const siteController = express.Router();
-
-// User model
-const User = require("../models/user");
-
-// Bcrypt to encrypt passwords
-const bcrypt = require("bcrypt");
-const bcryptSalt = 10;
-
-const passport = require("passport");
+const auth = require('../helpers/auth-helpers');
 
 /* GET home page. */
 siteController.get('/', (req, res, next) => {
@@ -18,20 +10,24 @@ siteController.get('/', (req, res, next) => {
 });
 
 siteController.get('/shop', (req, res, next) => {
-  res.render('shop')
+  res.render('shop');
 });
 
 siteController.get('/calendar', (req, res, next) => {
-  res.render('calendar')
+  res.render('calendar');
 });
 
 siteController.get('/history', (req, res, next) => {
-  res.render('history')
+  res.render('history');
 });
 
 
-siteController.get('/intranet', (req, res, next) => {
-  res.render('intranet')
+siteController.get('/intranet', auth.ensureLoggedIn('/login'), (req, res, next) => {
+  res.render('intranet/main');
+});
+
+siteController.get('/main', auth.ensureLoggedIn('/login'), (req, res, next) => {
+  res.render('intranet/main');
 });
 
 module.exports = siteController;

@@ -2,6 +2,9 @@
 // routes/auth-routes.js
 const express = require("express");
 const authRoutes = express.Router();
+const multer = require('multer');
+var upload = multer({dest:"./public/upload"});
+const Picture = require("../models/picture");
 
 // User model
 const User = require("../models/user");
@@ -20,19 +23,93 @@ authRoutes.get("/login", (req, res, next) => {
     "message": req.flash("error")
   });
 });
-//
-// authRoutes.post("/login", passport.authenticate("local", {
-//   successRedirect: "/",
-//   failureRedirect: "/login",
-//   failureFlash: true,
-//   passReqToCallback: true
-// }));
-//
-// authRoutes.get("/logout", (req, res) => {
-//   req.logout();
-//   res.redirect("/login");
-// });
-//
+
+authRoutes.post("/login", passport.authenticate("local", {
+  successRedirect: "/main",
+  failureRedirect: "/login",
+  failureFlash: true,
+  passReqToCallback: true
+}));
+
+authRoutes.get("/logout", (req, res) => {
+  req.logout();
+  res.redirect("/login");
+});
+
+authRoutes.get('/signup', (req, res) => {
+  res.render("intranet/auth/signup");
+});
+
+authRoutes.post('/signup', (req, res) => {
+  const username = req.body.username;
+  const name = req.body.name;
+  const lastName = req.body.lastName;
+  const email = req.body.email;
+  const password = req.body.password;
+  const ubication = req.body.ubication;
+  const address = req.body.address;
+  const pic_name = "default";
+  const pic_path = "../public/pictures/profile/default.png";
+  const role = req.body.role;
+  let wall;
+  let routes = [];
+  let albumns = [];
+  let tracks = [];
+  let messages = [];
+  let conversations = [];
+
+  if (username === "" || email === "" || password === "" || role === "") {
+    res.render("intranet/auth/sigmup", {
+      message: "Indicate username, email, password and role"
+    });
+    return;
+  }
+
+  User.findOne({$or:[{username:username},{email:email}]}, "username email", (err, user) => {
+    if (user !== null) {
+      res.render("intranet/auth/signup", {
+        message: "The username or email already exists"
+      });
+      return;
+    }
+
+    const salt = bcrypt.genSaltSync(bcryptSalt);
+    const hashPass = bcrypt.hashSync(password, salt);
+
+    const newUser = User({
+      username: username,
+      name: name,
+      lastName: lastName,
+      email: email,
+      password: hashPass,
+      ubication: ubication,
+      address: address,
+      pic_name: pic_name,
+      pic_path: pic_path,
+      role: role,
+      wall: wall,
+      routes: routes,
+      albumns: albumns,
+      tracks: tracks,
+      messages: messages,
+      conversations: conversations,
+    });
+
+    newUser.save((err) => {
+      if (err) {
+        res.render("intranet/auth/signup", {
+          message: "Something went wrong"
+        });
+      } else {
+        res.render("intranet/auth/login", {
+          message: "User Created"
+        });
+      }
+    });
+  });
+});
+
+
 // authRoutes.get('/:userId/show', auth.ensureLoggedIn('/'), (req, res) => {
 //   const userId = req.params.userId;
 //   User.findOne({
@@ -131,58 +208,10 @@ authRoutes.get("/login", (req, res, next) => {
 //   });
 // });
 //
-// authRoutes.get('/create-user', auth.checkRoles('ADMIN'), (req, res) => {
+// authRoutes.get('/signup', auth.checkRoles('ADMIN'), (req, res) => {
 //   res.render("intranet/auth/create-user");
 // });
 //
-// authRoutes.post('/create-user', auth.checkRoles('ADMIN'), (req, res) => {
-//   const name = req.body.name;
-//   const username = req.body.username;
-//   const familyName = req.body.famlyName;
-//   const password = req.body.password;
-//   const role = req.body.role;
-//
-//   if (username === "" || password === "" || role === "") {
-//     res.render("intranet/auth/create-user", {
-//       message: "Indicate username, password and role"
-//     });
-//     return;
-//   }
-//
-//   User.findOne({
-//     username
-//   }, "username", (err, user) => {
-//     if (user !== null) {
-//       res.render("intranet/auth/create-user", {
-//         message: "The username already exists"
-//       });
-//       return;
-//     }
-//
-//     const salt = bcrypt.genSaltSync(bcryptSalt);
-//     const hashPass = bcrypt.hashSync(password, salt);
-//
-//     const newUser = User({
-//       name: name,
-//       username: username,
-//       password: hashPass,
-//       familyName: familyName,
-//       role: role
-//     });
-//
-//     newUser.save((err) => {
-//       if (err) {
-//         res.render("intranet/auth/create-user", {
-//           message: "Something went wrong"
-//         });
-//       } else {
-//         res.render("intranet/auth/create-user", {
-//           message: "User Created"
-//         });
-//       }
-//     });
-//   });
-// });
 //
 
 //
