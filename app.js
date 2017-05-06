@@ -17,6 +17,7 @@ const passport = require('./helpers/passport');
 
 var siteController = require('./routes/siteController');
 var authController = require('./routes/authController');
+var profileController = require('./routes/profileController');
 
 var app = express();
 
@@ -52,6 +53,7 @@ app.use(auth.setCurrentUser);
 
 app.use('/', siteController);
 app.use('/', authController);
+app.use('/', profileController);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
