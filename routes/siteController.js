@@ -4,6 +4,8 @@ const auth = require('../helpers/auth-helpers');
 
 // User model
 const User = require("../models/user");
+// Wall model
+const Wall = require("../models/wall");
 
 /* GET home page. */
 siteController.get('/', (req, res, next) => {
@@ -31,9 +33,16 @@ siteController.get('/intranet', auth.ensureLoggedIn('/login'), (req, res, next) 
 });
 
 siteController.get('/main', auth.ensureLoggedIn('/login'), (req, res, next) => {
-  User.find({},(err,users)=>{
-    console.log("users",users);
-    res.render('intranet/main',{users: users});
+  Wall.find({wallType: 'GLOBAL'},(err,wall)=>{
+    if (err) {
+      next(err);
+    }
+    else {
+      User.find({},(err,users)=>{
+        console.log("users",users);
+        res.render('intranet/main',{users:users, wall:wall});
+      });
+    }
   });
 });
 
