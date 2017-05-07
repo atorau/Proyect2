@@ -1,0 +1,30 @@
+<h1>NEW ROUTE</h1>
+<form action="/routes/new" method="POST" id="form-container">
+  <label for="name">Name</label>
+  <input id="name" type="text" name="name" placeholder="" required>
+  <br><br>
+  <label for="ubication">Ubication</label>
+  <input id="ubication" type="text" name="ubication" placeholder="" required>
+  <br><br>
+  <label for="date">Date</label>
+  <input id="datenewroute" type="date" name="date" placeholder="" required>
+  <br><br>
+  <label for="description">Description</label>
+  <textarea name="description" rows="8" cols="80" placeholder="Write the description of the route" required> </textarea>
+  <br><br>
+
+  <button>Create Route</button>
+
+  <p class="account-message">
+    <a href="/">Home</a>
+  </p>
+
+  <p class="account-message">
+    <a href="/logout">Logout</a>
+  </p>
+</form>
+
+
+<script src="/jquery/dist/jquery.min.js"></script>
+<script src="/jquery-ui/jquery-ui.min.js"></script>
+<script src="/javascripts/dateinput.js"></script>

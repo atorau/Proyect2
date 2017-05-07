@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const routeSchema = new Schema({
   name: String,
   ubication: String,
+  description: String,
   comments: [{ type: Schema.Types.ObjectId, ref: "Message" }],
   albumn : { type: Schema.Types.ObjectId, ref: "Albumn" },
   date: Date,
