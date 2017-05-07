@@ -124,14 +124,14 @@ profileRoutes.get('/:username/profile', auth.ensureLoggedIn('/login'), (req, res
 });
 
 profileRoutes.post('/:user_id/profile/wallmessage', auth.ensureLoggedIn('/login'), (req, res, next) => {
-console.log('ENTRADA 1');
-let newMessage = {
-  message: req.body.wallText,
-  owner_id: req.user.id,
-  dest_id: req.params.user_id,
-  messageType: "WALL"
-};
-console.log('newMessage', newMessage);
+  console.log('ENTRADA 1');
+  let newMessage = {
+    message: req.body.wallText,
+    owner_id: req.user.id,
+    dest_id: req.params.user_id,
+    messageType: "WALL"
+  };
+  console.log('newMessage', newMessage);
   User.findById({
     _id: req.params.user_id
   }).populate('wall').exec((err, userwall) => {
@@ -181,7 +181,6 @@ console.log('newMessage', newMessage);
     }
   });
 });
-
 
 
 
