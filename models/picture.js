@@ -18,5 +18,5 @@ const pictureSchema = new Schema({
   updatedAt: "updated_at"
 }});
 
-var Picture = mongoose.model("Picture", pictureSchema);
+const Picture = mongoose.model("Picture", pictureSchema);
 module.exports = Picture;

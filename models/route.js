@@ -6,6 +6,7 @@ const routeSchema = new Schema({
   name: String,
   ubication: String,
   description: String,
+  owner_id: { type: Schema.Types.ObjectId, ref: "User" },
   comments: [{ type: Schema.Types.ObjectId, ref: "Message" }],
   albumn : { type: Schema.Types.ObjectId, ref: "Albumn" },
   date: Date,

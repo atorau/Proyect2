@@ -6,15 +6,15 @@ const trackSchema = new Schema({
   file_path: String,
   file_name: String,
   route_id: {
-    type: Schema.Types.ObjectID,
+    type: Schema.Types.ObjectId,
     ref: "Route"
   },
   owner_id: {
-    type: Schema.Types.ObjectID,
+    type: Schema.Types.ObjectId,
     ref: "User"
   },
 
 });
 
-var Track = mongoose.model("Track", trackSchema);
+const Track = mongoose.model("Track", trackSchema);
 module.exports = Track;
