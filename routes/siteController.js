@@ -60,6 +60,9 @@ siteController.post('/:wall_id/message', auth.ensureLoggedIn('/login'), (req, re
   Wall.findById({
     _id: req.params.wall_id
   }, (err, wall) => {
+    if (err){
+      next(err);
+    }
     let newMessage = {
       message: req.body.wallText,
       owner_id: req.user,

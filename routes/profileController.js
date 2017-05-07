@@ -12,11 +12,7 @@ const Picture = require("../models/picture");
 const User = require("../models/user");
 const Wall = require("../models/wall");
 const Route = require("../models/route");
-
-
-// Bcrypt to encrypt passwords
-const bcrypt = require("bcrypt");
-const bcryptSalt = 10;
+const Message = require("../models/message");
 
 const passport = require("passport");
 
@@ -48,16 +44,24 @@ profileRoutes.get('/:username/profile', auth.ensureLoggedIn('/login'), (req, res
           if (err) {
             next(err);
           }
-          res.render('intranet/users/profile', {
-            user,
-            wall
+          user.wall=userWall._id;
+          user.save((err,updatedUser)=>{
+            if(err){
+              next(err);
+            }else{
+              console.log('ENTRADA 6');
+              return res.render('intranet/users/profile', {
+                user,
+                wall
+              });
+            }
           });
         });
 
       } else {
         Wall.findOne({
           _id: user.wall
-        }, (err, wall) => {
+        }).populate('messages').exec((err, wall) => {
           if (err) {
             next(err);
           }
@@ -73,7 +77,7 @@ profileRoutes.get('/:username/profile', auth.ensureLoggedIn('/login'), (req, res
         path: 'routes'
       }).exec((err, user) => {
 
-        console.log('//////////////////////////////////');
+        console.log('------------------------------');
         if (user.wall === undefined) {
           const userWall = new Wall({
             owner_id: user._id,
@@ -85,16 +89,24 @@ profileRoutes.get('/:username/profile', auth.ensureLoggedIn('/login'), (req, res
             if (err) {
               next(err);
             }
-            res.render('intranet/users/profile', {
-              user,
-              wall
+            user.wall=userWall._id;
+            user.save((err,updatedUser)=>{
+              if(err){
+                next(err);
+              }else{
+                console.log('ENTRADA 6');
+                return res.render('intranet/users/profile', {
+                  user,
+                  wall
+                });
+              }
             });
           });
 
         } else {
           Wall.findOne({
             _id: user.wall
-          }, (err, wall) => {
+          }).populate('messages').exec((err, wall) => {
             if (err) {
               next(err);
             }
@@ -108,44 +120,67 @@ profileRoutes.get('/:username/profile', auth.ensureLoggedIn('/login'), (req, res
       });
 
     }
-
-
-
-
-    // console.log('+++++++++++++++++++++++++++++++++++');
-    // if (user.wall === undefined) {
-    //   const userWall = new Wall({
-    //     owner_id: user._id,
-    //     wallType: 'USER',
-    //     message: []
-    //   });
-    //
-    //   Wall.create(userWall, (err, wall) => {
-    //     if (err) {
-    //       next(err);
-    //     }
-    //     res.render('intranet/users/profile', {
-    //       user,
-    //       wall
-    //     });
-    //   });
-    //
-    // } else {
-    //   Wall.findOne({
-    //     _id: user.wall
-    //   }, (err, wall) => {
-    //     if (err) {
-    //       next(err);
-    //     }
-    //     res.render('intranet/users/profile', {
-    //       user,
-    //       wall
-    //     });
-    //   });
-    // }
   });
 });
 
+profileRoutes.post('/:user_id/profile/wallmessage', auth.ensureLoggedIn('/login'), (req, res, next) => {
+console.log('ENTRADA 1');
+let newMessage = {
+  message: req.body.wallText,
+  owner_id: req.user.id,
+  dest_id: req.params.user_id,
+  messageType: "WALL"
+};
+console.log('newMessage', newMessage);
+  User.findById({
+    _id: req.params.user_id
+  }).populate('wall').exec((err, userwall) => {
+    if(err){
+      next(err);
+    }
+    else{
+
+      console.log('ENTRADA 2');
+      console.log('newMessage', newMessage);
+      // let newMessage = {
+      //   message: req.body.wallText,
+      //   owner_id: req.user,
+      //   dest_id: req.params.user_id,
+      //   messageType: "WALL"
+      // };
+
+      Message.create(newMessage, (err, message) => {
+        if (err) {
+          console.log('no tengo ni puta idea de por que rompe aqui');
+          console.log('newMessage', newMessage);
+          next(err);
+        }else{
+        console.log('ENTRADA 3');
+        console.log('userwall', userwall);
+        console.log('userwall.wall', userwall.wall);
+
+          userwall.wall.messages.push(message);
+          userwall.wall.save((err, updatedWall) => {
+            if (err) {
+              next (err);
+            }else{
+              console.log('updatedWall', updatedWall);
+              req.user.messages.push(message);
+              req.user.save((err, updatedUser) => {
+                if (err) {
+                  next (err);
+                }else{
+                  console.log('updatedUser', updatedUser);
+                  return res.redirect('/'+ userwall.username +'/profile');
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+  });
+});
 
 
 
