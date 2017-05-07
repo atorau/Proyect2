@@ -75,12 +75,12 @@ profileRoutes.get('/:username/profile', auth.ensureLoggedIn('/login'), (req, res
       // user.populate('routes').exec((err, user) => {
       Route.populate(user, {
         path: 'routes'
-      }).exec((err, user) => {
+      }, (err, userPopulated) => {
 
         console.log('------------------------------');
-        if (user.wall === undefined) {
+        if (userPopulated.wall === undefined) {
           const userWall = new Wall({
-            owner_id: user._id,
+            owner_id: userPopulated._id,
             wallType: 'USER',
             message: []
           });
@@ -89,8 +89,8 @@ profileRoutes.get('/:username/profile', auth.ensureLoggedIn('/login'), (req, res
             if (err) {
               next(err);
             }
-            user.wall=userWall._id;
-            user.save((err,updatedUser)=>{
+            userPopulated.wall=userWall._id;
+            userPopulated.save((err,updatedUser)=>{
               if(err){
                 next(err);
               }else{

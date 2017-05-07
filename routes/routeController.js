@@ -11,6 +11,8 @@ const User = require("../models/user");
 const Wall = require("../models/wall");
 const Route = require("../models/route");
 const Message = require("../models/message");
+const Albumn = require("../models/albumn");
+const Track = require("../models/track");
 
 const passport = require("passport");
 
@@ -28,6 +30,7 @@ routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next
     ubication: req.body.ubication,
     date:req.body.date,
     description:req.body.description,
+    owner_id: req.user.id,
     comments:[],
     albumn: undefined,
     track:undefined
@@ -42,7 +45,7 @@ routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next
       if(err){
         next(err);
       }
-      res.render('/routes/'+ route._id+ '/show');
+      res.redirect('/routes/'+ route._id+ '/show');
     });
   });
 
@@ -51,12 +54,23 @@ routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next
 routeController.get('/routes/:route_id/show',auth.ensureLoggedIn('/login'), (req,res,next)=>{
 
   console.log('por aqui pasa');
-  let routeQuery=[{comments},{albumn},{track}];
+  let routeQuery=[{path: "comments"},{path: "albumn"},{path: "track"}];
 
-  Route.findById({_id: route_id}).populate(routeQuery).exec((err,route)=>{
+  Route.findById({_id: req.params.route_id}).populate(routeQuery).exec((err,route)=>{
     if (err){
       next (err);
     }
+  // Route.findById({_id: req.params.route_id},(err,route)=>{
+  //   if (err){
+  //     next (err);
+  //   }
+  //   if(route.albumn!==undefined)
+  //   {
+  //     Albumn
+  //   }
+  //   else{
+  //
+  //   }
 
     console.log("route",route);
     res.render("intranet/routes/show"); // var populateQuery = [{path:'books', select:'title pages'}, {path:'movie', select:'director'}];
