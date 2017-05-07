@@ -31,7 +31,6 @@ siteController.get('/history', (req, res, next) => {
 
 siteController.get('/intranet', auth.ensureLoggedIn('/login'), (req, res, next) => {
 
-
 });
 
 siteController.get('/main', auth.ensureLoggedIn('/login'), (req, res, next) => {
@@ -53,6 +52,45 @@ siteController.get('/main', auth.ensureLoggedIn('/login'), (req, res, next) => {
       });
     }
   });
+
+});
+
+siteController.post('/:wall_id/message', auth.ensureLoggedIn('/login'), (req, res, next) => {
+  console.log('params ', req.params.wall_id);
+  Wall.findById({
+    _id: req.params.wall_id
+  }, (err, wall) => {
+    let newMessage = {
+      message: req.body.wallText,
+      owner_id: req.user,
+      dest_id: undefined,
+      messageType: "GLOBAL"
+    };
+
+    Message.create(newMessage, (err, message) => {
+      if (err) {
+        next(err);
+      }
+
+      wall.messages.push(message);
+      wall.save((err, updatedWall) => {
+        if (err) {
+          throw err;
+        }
+
+        console.log('updatedWall', updatedWall);
+        req.user.messages.push(message);
+        req.user.save((err, updatedUser) => {
+          if (err) {
+            throw err;
+          }
+          console.log('updatedUser', updatedUser);
+          res.redirect('/main');
+        });
+      });
+    });
+  });
+
 
 });
 

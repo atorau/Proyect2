@@ -34,7 +34,24 @@
         <%})%>
           <%}%>
             <%}%>
+
 </ul>
+<form action="/<%= wall._id %>/message" method="POST" id="form-container">
+  <label for="wallText">Message: </label>
+  <input id="wallText" type="text" name="wallText" placeholder="your text here" required>
+  <br><br>
+
+  <% if (typeof message !== "undefined") { %>
+    <div class="error-message">
+      <%= message %>
+    </div>
+    <% } %>
+      <br><br>
+
+      <button>New message</button>
+
+</form>
+
 
 
 
