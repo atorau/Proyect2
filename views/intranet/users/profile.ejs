@@ -23,6 +23,39 @@
     <%}%>
 </ul>
 
+<h1>Profile WALL</h1>
+<ul>
+  <%if(typeof(wall)!=='undefined'){%>
+    <% if(wall.messages.length){ %>
+      <% wall.messages.forEach((message)=>{%>
+        <li>
+          <p>
+            <%=message.message%>
+              </a>
+          </p>
+        </li>
+        <%})%>
+          <%}%>
+            <%}%>
+
+</ul>
+
+
+<form action="/<%= user._id %>/profile/wallmessage" method="POST" id="form-container">
+  <label for="wallText">Message: </label>
+  <input id="wallText" type="text" name="wallText" placeholder="your text here" required>
+  <br><br>
+
+  <% if (typeof message !== "undefined") { %>
+    <div class="error-message">
+      <%= message %>
+    </div>
+    <% } %>
+      <br><br>
+
+      <button>New message</button>
+
+</form>
 
 
 
