@@ -12,27 +12,19 @@
     </li>
     <li>
       <p>
-        <%=user.familyName%>
+        <%=user.lastName%>
       </p>
     </li>
     <li>
       <p>
-        <%=user.role%>
+        <%=user.email%>
       </p>
     </li>
     <%}%>
 </ul>
 
-<%if(user.username === currentUser.username || currentUser.role === 'Boss'){ %>
-  <p class="account-message">
-    <a href="/<%=user._id%>/edit">Edit</a>
-  </p>
-  <%}%>
 
-    <p class="account-message">
-      <a href="/">Home</a>
-    </p>
 
-    <p class="account-message">
-      <a href="/user-list">User List</a>
-    </p>
+<p class="main">
+  <a href="/main">Home</a>
+</p>
