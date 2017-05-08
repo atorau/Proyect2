@@ -60,6 +60,10 @@ routeController.get('/routes/:route_id/show',auth.ensureLoggedIn('/login'), (req
     if (err){
       next (err);
     }
+    // if(route.comments !== 0){
+      // route.findOne(route).populate(comments)
+
+      // }
   // Route.findById({_id: req.params.route_id},(err,route)=>{
   //   if (err){
   //     next (err);
@@ -73,7 +77,7 @@ routeController.get('/routes/:route_id/show',auth.ensureLoggedIn('/login'), (req
   //   }
 
     console.log("route",route);
-    res.render("intranet/routes/show"); // var populateQuery = [{path:'books', select:'title pages'}, {path:'movie', select:'director'}];
+    res.render("intranet/routes/show",{route}); // var populateQuery = [{path:'books', select:'title pages'}, {path:'movie', select:'director'}];
     // //    Person.find({})
     //     .populate(populateQuery)
     //     .execPopulate()

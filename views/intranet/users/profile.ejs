@@ -58,8 +58,13 @@
 </form>
 
 <h1>AQUI LAS RUTAS</h1>
-
-
+<ul>
+  <% if(user.routes.length){ %>
+    <% user.routes.forEach((route)=>{ %>
+          <li><a href="/routes/<%= route._id %>/show"><%= route.name %></a></li>
+    <% })%>
+  <% }%>
+</ul>
 <%if (currentUser.username === user.username){ %>
   <a href="/routes/new">New Route</a>
 
