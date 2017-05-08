@@ -10,9 +10,11 @@ const userSchema = new Schema({
     password: String,
     ubication: String,
     addess: String,
-    pic_path: String,
-    pic_name: String,
-    //
+
+    picture: {
+      type: Schema.Types.ObjectId,
+      ref: "Picture"
+    },
     role: {
       type: String,
       enum: ['ADMIN', 'USER'],

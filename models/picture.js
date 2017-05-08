@@ -5,9 +5,14 @@ const pictureSchema = new Schema({
   name: String,
   pic_path: String,
   pic_name: String,
-  album_id: {
+  pictureType : {
+    type: String,
+    enum: ['PROFILE','ALBUMN','PRODUCT'],
+    default: 'ALBUMN'
+  },
+  albumm_id: {
     type: Schema.Types.ObjectId,
-    ref: "Album"
+    ref: "Albumm"
   },
   owner_id: {
     type: Schema.Types.ObjectId,
