@@ -1,3 +1,6 @@
+var dotenv = require('dotenv');
+dotenv.load();
+
 const express = require("express");
 const routeController = express.Router();
 const multer = require('multer');
@@ -81,7 +84,7 @@ routeController.get('/routes/:route_id/show',auth.ensureLoggedIn('/login'), (req
       next (err);
     }
     console.log("route",route);
-    res.render("intranet/routes/show",{route});
+    res.render("intranet/routes/show",{route: route, key: process.env.GOOGLE_KEY});
   });
 });
 

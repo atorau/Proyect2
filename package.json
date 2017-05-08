@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "nodemon ./bin/www",
-    "seed" : "node ./bin/seed.js"
+    "seed": "node ./bin/seed.js"
   },
   "dependencies": {
     "bcrypt": "^1.0.2",
@@ -12,6 +12,7 @@
     "connect-flash": "^0.1.1",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.3",
+    "dotenv": "^4.0.0",
     "ejs": "~2.5.6",
     "ejs-layouts": "0.0.1",
     "express": "~4.15.2",

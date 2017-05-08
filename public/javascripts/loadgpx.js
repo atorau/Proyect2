@@ -52,24 +52,24 @@ function GPXParser(xmlDoc, map) {
     this.map = map;
     this.trackcolour = "#ff00ff"; // red
     this.trackwidth = 5;
-    this.mintrackpointdelta = 0.0001
+    this.mintrackpointdelta = 0.0001;
 }
 
 // Set the colour of the track line segements.
 GPXParser.prototype.setTrackColour = function(colour) {
     this.trackcolour = colour;
-}
+};
 
 // Set the width of the track line segements
 GPXParser.prototype.setTrackWidth = function(width) {
     this.trackwidth = width;
-}
+};
 
 // Set the minimum distance between trackpoints.
 // Used to cull unneeded trackpoints from map.
 GPXParser.prototype.setMinTrackPointDelta = function(delta) {
     this.mintrackpointdelta = delta;
-}
+};
 
 GPXParser.prototype.translateName = function(name) {
     if(name == "wpt") {
@@ -81,7 +81,7 @@ GPXParser.prototype.translateName = function(name) {
     else if(name == "rtept") {
         return "Route Point";
     }
-}
+};
 
 
 GPXParser.prototype.createMarker = function(point) {
@@ -131,7 +131,7 @@ GPXParser.prototype.createMarker = function(point) {
     google.maps.event.addListener(marker, "click", function() {
         infowindow.open(this.map, marker);
     });
-}
+};
 
 GPXParser.prototype.addTrackSegmentToMap = function(trackSegment, colour,
         width) {
@@ -171,7 +171,7 @@ GPXParser.prototype.addTrackSegmentToMap = function(trackSegment, colour,
         strokeWeight: width,
         map: this.map
     });
-}
+};
 
 GPXParser.prototype.addTrackToMap = function(track, colour, width) {
     var segments = track.getElementsByTagName("trkseg");
@@ -179,7 +179,7 @@ GPXParser.prototype.addTrackToMap = function(track, colour, width) {
         var segmentlatlngbounds = this.addTrackSegmentToMap(segments[i], colour,
                 width);
     }
-}
+};
 
 GPXParser.prototype.addRouteToMap = function(route, colour, width) {
     var routepoints = route.getElementsByTagName("rtept");
@@ -218,7 +218,7 @@ GPXParser.prototype.addRouteToMap = function(route, colour, width) {
         strokeWeight: width,
         map: this.map
     });
-}
+};
 
 GPXParser.prototype.centerAndZoom = function(trackSegment) {
 
@@ -267,7 +267,7 @@ GPXParser.prototype.centerAndZoom = function(trackSegment) {
             new google.maps.LatLng(maxlat, maxlon));
     this.map.setCenter(new google.maps.LatLng(centerlat, centerlon));
     this.map.fitBounds(bounds);
-}
+};
 
 GPXParser.prototype.centerAndZoomToLatLngBounds = function(latlngboundsarray) {
     var boundingbox = new google.maps.LatLngBounds();
@@ -284,25 +284,25 @@ GPXParser.prototype.centerAndZoomToLatLngBounds = function(latlngboundsarray) {
             boundingbox.getSouthWest().lng()) / 2;
     this.map.setCenter(new google.maps.LatLng(centerlat, centerlng),
             this.map.getBoundsZoomLevel(boundingbox));
-}
+};
 
 GPXParser.prototype.addTrackpointsToMap = function() {
     var tracks = this.xmlDoc.documentElement.getElementsByTagName("trk");
     for(var i = 0; i < tracks.length; i++) {
         this.addTrackToMap(tracks[i], this.trackcolour, this.trackwidth);
     }
-}
+};
 
 GPXParser.prototype.addWaypointsToMap = function() {
     var waypoints = this.xmlDoc.documentElement.getElementsByTagName("wpt");
     for(var i = 0; i < waypoints.length; i++) {
         this.createMarker(waypoints[i]);
     }
-}
+};
 
 GPXParser.prototype.addRoutepointsToMap = function() {
     var routes = this.xmlDoc.documentElement.getElementsByTagName("rte");
     for(var i = 0; i < routes.length; i++) {
         this.addRouteToMap(routes[i], this.trackcolour, this.trackwidth);
     }
-}
+};

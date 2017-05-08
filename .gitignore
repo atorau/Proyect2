@@ -28,6 +28,7 @@ node_modules
 bower_components
 public/uploads
 public/pictures
+.env
 
 # Debug log from npm
 npm-debug.log
