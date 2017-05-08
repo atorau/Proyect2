@@ -2,7 +2,7 @@ const express = require("express");
 const routeController = express.Router();
 const multer = require('multer');
 var upload = multer({
-  dest: "./public/upload"
+  dest: "./public/uploads/albumns"
 });
 const Picture = require("../models/picture");
 
@@ -120,7 +120,7 @@ routeController.post('/routes/:route_id/comment',auth.ensureLoggedIn('/login'), 
 
 
 routeController.get('/routes/:albumn_id/albumn',auth.ensureLoggedIn('/login'),(req,res, next)=>{
-  Albumn.findById({_id: req.params.albumn_id}, (err,albumn)=>{
+  Albumn.findById({_id: req.params.albumn_id}).populate("pictures").exec((err,albumn)=>{
     if(err){
       next(err);
     }
