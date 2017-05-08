@@ -1,3 +1,17 @@
 <h1>ESTO ES UNA RUTA</h1>
 
+
+
+
+
+
+
+<h1>here comments</h1>
+
+<% if(route.comments.length){ %>
+  <%route.comments.forEach((comment)=>{ %>
+    <p><%= comment.message %></p>
+  <% }) %>
+<% } %>
+
 <a href="/main">Home</a>
