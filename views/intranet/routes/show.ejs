@@ -1,8 +1,4 @@
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js">
-</script>
-<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
-<script type="text/javascript" src="javascripts/gpxviewer.js"></script>
-<script type="text/javascript" src="javascripts/loadgpx.js"></script>
+
 
 <h1><%= route.name %></h1>
 
@@ -11,31 +7,29 @@
     <section>
       <h4><%= route.track.name %></h4>
     </section>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js">
+    </script>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=<%=key%>">
+    </script>
+    <script type="text/javascript" src="/javascripts/APIHandler.js"></script>
+    <script type="text/javascript" src="/javascripts/loadgpx.js"></script>
+    <script type="text/javascript" src="/javascripts/gpxviewer.js"></script>
+    <div id="map" style="width: 45%; height: 45%;"></div>
 <% } %>
-
-
-<div id="map" style="width: 45%; height: 45%;"></div>
-
-
-
-
 <section>
   <h2>Upload your Track</h2>
-  <form action="/routes/<%= route._id %>/uploadtrack" method="post" enctype="multipart/form-data">
+  <form class="track-route" route-id="<%= route._id %>" action="/routes/<%= route._id %>/uploadtrack" method="post" enctype="multipart/form-data">
     <input type="file" name="track">
     <input type="submit" value="Save">
   </form>
 </section>
-
-
 <form action="/routes/<%= route._id %>/comment" method="POST" id="form-container">
   <label for="comment">Message: </label>
   <input id="comment" type="text" name="comment" placeholder="your comment here" required>
   <br><br>
   <button>New comment</button>
 </form>
-
-
 
 <h1>here comments</h1>
 
@@ -44,7 +38,6 @@
     <p><%= comment.message %></p>
   <% }) %>
 <% } %>
-
 
 <a href="/routes/<%= route.albumn._id %>/albumn">Albumn</a>
 <br><br>
