@@ -84,6 +84,8 @@ routeController.get('/routes/:route_id/show',auth.ensureLoggedIn('/login'), (req
       next (err);
     }
     console.log("route",route);
+    console.log("++++++++++++++++++++++++++++++++++++++");
+    console.log("key", process.env.GOOGLE_KEY);
     res.render("intranet/routes/show",{route: route, key: process.env.GOOGLE_KEY});
   });
 });
@@ -193,6 +195,15 @@ routeController.post('/routes/:route_id/uploadtrack', uploadTrack.single("track"
         });
       });
     });
+  });
+});
+
+routeController.get('/routes/index',auth.ensureLoggedIn('/login'),(req, res, next)=>{
+  Route.find({}, (err,routes)=>{
+    if(err){
+      next(err);
+    }
+    res.render('intranet/routes/index',{routes:routes});
   });
 });
 
