@@ -60,33 +60,46 @@ routeController.get('/routes/:route_id/show',auth.ensureLoggedIn('/login'), (req
     if (err){
       next (err);
     }
-    // if(route.comments !== 0){
-      // route.findOne(route).populate(comments)
-
-      // }
-  // Route.findById({_id: req.params.route_id},(err,route)=>{
-  //   if (err){
-  //     next (err);
-  //   }
-  //   if(route.albumn!==undefined)
-  //   {
-  //     Albumn
-  //   }
-  //   else{
-  //
-  //   }
-
     console.log("route",route);
-    res.render("intranet/routes/show",{route}); // var populateQuery = [{path:'books', select:'title pages'}, {path:'movie', select:'director'}];
-    // //    Person.find({})
-    //     .populate(populateQuery)
-    //     .execPopulate()
+    res.render("intranet/routes/show",{route});
   });
 });
 
 
-
-
+routeController.post('/routes/:route_id/comment',auth.ensureLoggedIn('/login'), (req,res,next)=>{
+  Route.findById({_id: req.params.route_id}, (err,route)=>{
+    if(err){
+      next(err);
+    }
+    let newComment ={
+      message:req.body.comment,
+      owner_id: req.user.id,
+      dest_id: route.owner_id,
+      messageType: "ROUTE"
+    };
+    Message.create(newComment, (err, comment) => {
+      if (err) {
+        next(err);
+      }else{
+        route.comments.push(comment);
+        route.save((err, updatedRoute) => {
+          if (err) {
+            next (err);
+          }else{
+            req.user.messages.push(comment);
+            req.user.save((err, updatedUser) => {
+              if (err) {
+                next (err);
+              }else{
+                return res.redirect('/routes/'+ updatedRoute._id +'/show');
+              }
+            });
+          }
+        });
+      }
+    });
+  });
+});
 
 
 
