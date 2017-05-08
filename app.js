@@ -17,6 +17,8 @@ const passport = require('./helpers/passport');
 
 var siteController = require('./routes/siteController');
 var authController = require('./routes/authController');
+var profileController = require('./routes/profileController');
+var routeController = require('./routes/routeController');
 
 var app = express();
 
@@ -36,6 +38,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "bower_components")));
 
 app.use(session({
   secret: "proyecto-ironhack",
@@ -52,6 +55,8 @@ app.use(auth.setCurrentUser);
 
 app.use('/', siteController);
 app.use('/', authController);
+app.use('/', profileController);
+app.use('/', routeController);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

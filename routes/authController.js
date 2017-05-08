@@ -36,7 +36,7 @@ authRoutes.get("/logout", (req, res) => {
   res.redirect("/login");
 });
 
-authRoutes.get('/signup', (req, res) => {
+authRoutes.get('/signup', auth.ifAlreadyLoggedIn('/main'), (req, res) => {
   res.render("intranet/auth/signup");
 });
 

@@ -6,17 +6,54 @@
     <% users.forEach((user)=>{%>
       <li>
         <p>
-          <a href="/<%=user._id%>/show">
+          <a href="/<%=user.username%>/profile">
             <%=user.username%>
           </a>
-          <!-- <%if(currentUser.role ==='Boss' && user.role!=='Boss'){%>
-          <a href="/<%=user._id%>/delete">Delete</a> -->
-          <%}%>
         </p>
       </li>
       <%})%>
         <%}%>
 </ul>
+
+
+
+<h1>AQUI EL CALENDAR</h1>
+
+
+<h1>AQUI EL WALL</h1>
+<ul>
+  <%if(typeof(wall)!=='undefined'){%>
+    <% if(wall.messages.length){ %>
+      <% wall.messages.forEach((message)=>{%>
+        <li>
+          <p>
+            <%=message.message%>
+              </a>
+          </p>
+        </li>
+        <%})%>
+          <%}%>
+            <%}%>
+
+</ul>
+<form action="/<%= wall._id %>/message" method="POST" id="form-container">
+  <label for="wallText">Message: </label>
+  <input id="wallText" type="text" name="wallText" placeholder="your text here" required>
+  <br><br>
+
+  <% if (typeof message !== "undefined") { %>
+    <div class="error-message">
+      <%= message %>
+    </div>
+    <% } %>
+      <br><br>
+
+      <button>New message</button>
+
+</form>
+
+
+
 
 <p class="account-message">
   <a href="/">Home</a>
