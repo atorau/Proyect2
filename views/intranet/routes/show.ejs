@@ -1,6 +1,24 @@
 <h1><%= route.name %></h1>
 
 
+<% if(typeof(route.track) !== "undefined"){ %>
+    <section>
+      <h4><%= route.track.name %></h4>
+    </section>
+<% } %>
+
+
+
+
+
+<section>
+  <h2>Upload your Track</h2>
+  <form action="/routes/<%= route._id %>/uploadtrack" method="post" enctype="multipart/form-data">
+    <input type="file" name="track">
+    <input type="submit" value="Save">
+  </form>
+</section>
+
 
 <form action="/routes/<%= route._id %>/comment" method="POST" id="form-container">
   <label for="comment">Message: </label>

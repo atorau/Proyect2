@@ -1,8 +1,11 @@
 const express = require("express");
 const routeController = express.Router();
 const multer = require('multer');
-var upload = multer({
+var uploadPhoto = multer({
   dest: "./public/uploads/albumns"
+});
+var uploadTrack = multer({
+  dest: "./public/uploads/tracks"
 });
 const Picture = require("../models/picture");
 
@@ -130,7 +133,7 @@ routeController.get('/routes/:albumn_id/albumn',auth.ensureLoggedIn('/login'),(r
   });
 });
 
-routeController.post('/routes/:albumn_id/uploadalbumnimage', upload.single('photo'), (req, res, next)=>{
+routeController.post('/routes/:albumn_id/uploadalbumnimage', uploadPhoto.single('photo'), (req, res, next)=>{
   Albumn.findById({_id: req.params.albumn_id}, (err,albumn)=>{
     if(err){
       next(err);
@@ -156,24 +159,39 @@ routeController.post('/routes/:albumn_id/uploadalbumnimage', upload.single('phot
   });
 });
 
-// Picture.populate(route,{
-//   path: 'picture'
-// }, (err, userPicture) =>{
-//   if(err){
-//     next(err);
-//   }
-//   else {
-//     newPicture.save((err,picture) => {
-//         req.user.picture = picture._id;
-//         req.user.save((err, userUpdated)=>{
-//           if(err){
-//             next(err);
-//           }
-//           res.redirect('/'+req.user.username+'/profile');
-//       });
-//     });
-//    }
-// });
+
+routeController.post('/routes/:route_id/uploadtrack', uploadTrack.single("track"),(req,res,next)=>{
+  Route.findById({_id: req.params.route_id}, (err,route)=>{
+    if(err){
+      next(err);
+    }
+    let newTrack = new Track({
+      name: route.name,
+      file_path: `/uploads/tracks/${req.file.filename}`,
+      file_name: req.file.originalname,
+      route_id : route._id,
+      owner_id : route.owner_id
+    });
+    newTrack.save((err,track)=>{
+      if(err){
+        next(err);
+      }
+      route.track = track._id;
+      route.save((err,updatedRoute)=>{
+        if(err){
+          next(err);
+        }
+        req.user.tracks.push(track);
+        req.user.save((err,updatedUser)=>{
+          if(err){
+            next(err);
+          }
+          res.redirect('/routes/'+ route._id +'/show');
+        });
+      });
+    });
+  });
+});
 
 
 
