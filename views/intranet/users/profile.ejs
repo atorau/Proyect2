@@ -1,3 +1,23 @@
+
+<%if(typeof(user)!=='undefined'){%>
+  <section>
+      <img src="<%= user.picture.pic_path %>" alt="<%= user.picture.pic_name %>" />
+  </section>
+<% }%>
+<%if(typeof(user)!=='undefined'){%>
+  <%if (currentUser.username === user.username){ %>
+    <section>
+      <h2>Upload your photo</h2>
+      <form action="/uploadprofile" method="post" enctype="multipart/form-data">
+        <input type="text" name="name">
+        <input type="file" name="photo">
+        <input type="submit" value="Save">
+      </form>
+    </section>
+  <% }%>
+<% }%>
+
+
 <ul>
   <%if(typeof(user)!=='undefined'){%>
     <li>

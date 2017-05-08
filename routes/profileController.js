@@ -1,10 +1,10 @@
 /*jshint esversion: 6*/
 // routes/auth-routes.js
 const express = require("express");
-const profileRoutes = express.Router();
+const profileController = express.Router();
 const multer = require('multer');
 var upload = multer({
-  dest: "./public/upload"
+  dest: "./public/uploads"
 });
 const Picture = require("../models/picture");
 
@@ -19,46 +19,78 @@ const passport = require("passport");
 const auth = require('../helpers/auth-helpers');
 
 
-profileRoutes.get('/:username/profile', auth.ensureLoggedIn('/login'), (req, res, next) => {
+/////////////////////////////FS FILES////////////////////////
+const fs = require('fs');
+const path = require('path');
+let destDir = path.join(__dirname, '../public');
+//////////////////////////////////////////////////////////////
+
+
+
+
+profileController.post('/uploadprofile', upload.single('photo'), (req, res, next)=>{
+
+  let newPicture = new Picture({
+    name: req.body.name,
+    pictureType: 'PROFILE',
+    albumn_id: undefined,
+    owner_id: req.user.id,
+    pic_path: `/uploads/${req.file.filename}`,
+    pic_name: req.file.originalname
+  });
+
+  Picture.populate(req.user,{
+    path: 'picture'
+  }, (err, userPicture) =>{
+    if(err){
+      next(err);
+    }
+
+    fs.unlink(path.join(destDir, userPicture.picture.pic_path), (err)=>{
+      if(err){
+        next(err);
+      }
+      else {
+        newPicture.save((err,picture) => {
+            req.user.picture = picture._id;
+            req.user.save((err, userUpdated)=>{
+              if(err){
+                next(err);
+              }
+              res.redirect('/'+req.user.username+'/profile');
+            });
+        });
+      }
+    });
+  });
+});
+
+profileController.get('/:username/profile', auth.ensureLoggedIn('/login'), (req, res, next) => {
 
   let username = req.params.username;
-  console.log('username', username);
 
   User.findOne({
     username: username
-  }, (err, user) => {
+  }).populate('picture').exec((err, user) => {
     if (err) {
       next(err);
     }
-    console.log('user.routes', user.routes);
     if (user.routes.length === 0) {
-      console.log('+++++++++++++++++++++++++++++++++++');
-      if (user.wall === undefined) {
-        const userWall = new Wall({
-          owner_id: user._id,
-          wallType: 'USER',
-          message: []
+      Wall.findOne({
+        _id: user.wall
+      }).populate('messages').exec((err, wall) => {
+        if (err) {
+          next(err);
+        }
+        res.render('intranet/users/profile', {
+          user,
+          wall
         });
-
-        Wall.create(userWall, (err, wall) => {
-          if (err) {
-            next(err);
-          }
-          user.wall=userWall._id;
-          user.save((err,updatedUser)=>{
-            if(err){
-              next(err);
-            }else{
-              console.log('ENTRADA 6');
-              return res.render('intranet/users/profile', {
-                user,
-                wall
-              });
-            }
-          });
-        });
-
-      } else {
+      });
+    } else {
+      Route.populate(user, {
+        path: 'routes'
+      }, (err, userPopulated) => {
         Wall.findOne({
           _id: user.wall
         }).populate('messages').exec((err, wall) => {
@@ -70,60 +102,12 @@ profileRoutes.get('/:username/profile', auth.ensureLoggedIn('/login'), (req, res
             wall
           });
         });
-      }
-    } else {
-      // user.populate('routes').exec((err, user) => {
-      Route.populate(user, {
-        path: 'routes'
-      }, (err, userPopulated) => {
-
-        console.log('------------------------------');
-        if (userPopulated.wall === undefined) {
-          const userWall = new Wall({
-            owner_id: userPopulated._id,
-            wallType: 'USER',
-            message: []
-          });
-
-          Wall.create(userWall, (err, wall) => {
-            if (err) {
-              next(err);
-            }
-            userPopulated.wall=userWall._id;
-            userPopulated.save((err,updatedUser)=>{
-              if(err){
-                next(err);
-              }else{
-                console.log('ENTRADA 6');
-                return res.render('intranet/users/profile', {
-                  user,
-                  wall
-                });
-              }
-            });
-          });
-
-        } else {
-          Wall.findOne({
-            _id: user.wall
-          }).populate('messages').exec((err, wall) => {
-            if (err) {
-              next(err);
-            }
-            res.render('intranet/users/profile', {
-              user,
-              wall
-            });
-          });
-        }
-
       });
-
     }
   });
 });
 
-profileRoutes.post('/:user_id/profile/wallmessage', auth.ensureLoggedIn('/login'), (req, res, next) => {
+profileController.post('/:user_id/profile/wallmessage', auth.ensureLoggedIn('/login'), (req, res, next) => {
   console.log('ENTRADA 1');
   let newMessage = {
     message: req.body.wallText,
@@ -142,12 +126,6 @@ profileRoutes.post('/:user_id/profile/wallmessage', auth.ensureLoggedIn('/login'
 
       console.log('ENTRADA 2');
       console.log('newMessage', newMessage);
-      // let newMessage = {
-      //   message: req.body.wallText,
-      //   owner_id: req.user,
-      //   dest_id: req.params.user_id,
-      //   messageType: "WALL"
-      // };
 
       Message.create(newMessage, (err, message) => {
         if (err) {
@@ -184,4 +162,4 @@ profileRoutes.post('/:user_id/profile/wallmessage', auth.ensureLoggedIn('/login'
 
 
 
-module.exports = profileRoutes;
+module.exports = profileController;
