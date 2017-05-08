@@ -1,8 +1,13 @@
-<h1>ESTO ES UNA RUTA</h1>
+<h1><%= route.name %></h1>
 
 
 
-
+<form action="/routes/<%= route._id %>/comment" method="POST" id="form-container">
+  <label for="comment">Message: </label>
+  <input id="comment" type="text" name="comment" placeholder="your comment here" required>
+  <br><br>
+  <button>New comment</button>
+</form>
 
 
 
