@@ -22,10 +22,13 @@ const auth = require('../helpers/auth-helpers');
 /////////////////////////////FS FILES////////////////////////
 const fs = require('fs');
 const path = require('path');
+let destDir = path.join(__dirname, '../public');
 //////////////////////////////////////////////////////////////
 
 
-profileController.post('/uploadprofile', upload.single('photo'), function(req, res){
+
+
+profileController.post('/uploadprofile', upload.single('photo'), (req, res, next)=>{
 
   let newPicture = new Picture({
     name: req.body.name,
@@ -43,18 +46,21 @@ profileController.post('/uploadprofile', upload.single('photo'), function(req, r
       next(err);
     }
 
-    fs.unlink(user.picture.pic_path);
-    
-    newPicture.save((err,picture) => {
-        req.user.picture = picture._id;
-        req.user.save((err, userUpdated)=>{
-          if(err){
-            next(err);
-          }
-          console.log("req.user",req.user);
-          console.log("picture._id",picture._id);
-          res.redirect('/'+req.user.username+'/profile');
+    fs.unlink(path.join(destDir, userPicture.picture.pic_path), (err)=>{
+      if(err){
+        next(err);
+      }
+      else {
+        newPicture.save((err,picture) => {
+            req.user.picture = picture._id;
+            req.user.save((err, userUpdated)=>{
+              if(err){
+                next(err);
+              }
+              res.redirect('/'+req.user.username+'/profile');
+            });
         });
+      }
     });
   });
 });
