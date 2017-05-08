@@ -3,10 +3,6 @@ const Schema = mongoose.Schema;
 
 const albumnSchema = new Schema({
   title: String,
-  comments: [{
-    type: Schema.Types.ObjectId,
-    ref: "Message"
-  }],
   pictures: [{
     type: Schema.Types.ObjectId,
     ref: "Picture"
