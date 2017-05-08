@@ -1,0 +1,16 @@
+<h1><%= albumn.title %></h1>
+<p><strong>Title Albumn: </strong><%= albumn.title %></p>
+
+
+<section>
+  <h2>Upload your photo</h2>
+  <form action="/routes/<% albumn._id %>/uploadalbumnimage" method="post" enctype="multipart/form-data">
+    <input type="text" name="name">
+    <input type="file" name="photo">
+    <input type="submit" value="Save">
+  </form>
+</section>
+
+<p class="account-message">
+  <a href="/main">Main</a>
+</p>

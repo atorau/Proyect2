@@ -35,20 +35,37 @@ routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next
     albumn: undefined,
     track:undefined
   };
-
+///////////////////////////////////////////////////////////////
   Route.create(newRoute,(err, route)=>{
     if(err){
       next(err);
     }
-    req.user.routes.push(route);
-    req.user.save((err, user)=>{
+    let newAlbumn={
+      title: route.name,
+      pictures:[],
+      route_id: route._id,
+      owner_id: route.owner_id,
+    };
+    Albumn.create(newAlbumn, (err, albumn)=>{
       if(err){
         next(err);
       }
-      res.redirect('/routes/'+ route._id+ '/show');
+      route.albumn = albumn._id;
+      route.save((err, routeUpdated)=>{
+        if(err){
+          next(err);
+        }
+        req.user.routes.push(route);
+        req.user.albumns.push(albumn);
+        req.user.save((err,userUpdated)=>{
+          if(err){
+            next(err);
+          }
+          res.redirect('/routes/'+ route._id+ '/show');
+        });
+      });
     });
   });
-
 });
 
 routeController.get('/routes/:route_id/show',auth.ensureLoggedIn('/login'), (req,res,next)=>{
@@ -100,6 +117,63 @@ routeController.post('/routes/:route_id/comment',auth.ensureLoggedIn('/login'), 
     });
   });
 });
+
+
+routeController.get('/routes/:albumn_id/albumn',auth.ensureLoggedIn('/login'),(req,res, next)=>{
+  Albumn.findById({_id: req.params.albumn_id}, (err,albumn)=>{
+    if(err){
+      next(err);
+    }
+    else{
+      res.render('intranet/albumns/show',{albumn});
+    }
+  });
+});
+
+routeController.post('/routes/:albumn_id/uploadalbumnimage', upload.single('photo'), (req, res, next)=>{
+  Albumn.findById({_id: req.params.albumn_id}, (err,albumn)=>{
+    if(err){
+      next(err);
+    }
+    let newPicture = new Picture({
+      name: req.body.name,
+      pictureType: 'ALBUMN',
+      albumn_id: albumn._id,
+      route_id: albumn.route_id,
+      owner_id: albumn.owner_id,
+      pic_path: `/uploads/albumns/${req.file.filename}`,
+      pic_name: req.file.originalname
+    });
+    newPicture.save((err,picture) => {
+        albumn.pictures.push(picture);
+        albumn.save((err, albumnUpdated)=>{
+          if(err){
+            next(err);
+          }
+          res.redirect('/routes/'+ albumn._id +'/albumn');
+      });
+    });
+  });
+});
+
+// Picture.populate(route,{
+//   path: 'picture'
+// }, (err, userPicture) =>{
+//   if(err){
+//     next(err);
+//   }
+//   else {
+//     newPicture.save((err,picture) => {
+//         req.user.picture = picture._id;
+//         req.user.save((err, userUpdated)=>{
+//           if(err){
+//             next(err);
+//           }
+//           res.redirect('/'+req.user.username+'/profile');
+//       });
+//     });
+//    }
+// });
 
 
 
