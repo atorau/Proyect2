@@ -14,7 +14,7 @@
 <% if(albumn.pictures.length){ %>
 <%  albumn.pictures.forEach((picture)=>{ %>
     <li><section>
-      <img src="<%= picture.pic_path %>" alt="<%= picture.pic_name %>" /><a href="/routes/<%= albumn._id %>/delete-image/<%= picture._id %>"></a>
+      <img src="<%= picture.pic_path %>" alt="<%= picture.pic_name %>" /><a href="/routes/<%= albumn._id %>/delete-image/<%= picture._id %>">Delete</a>
     </section></li>
 <% }) %>
 <% } %>

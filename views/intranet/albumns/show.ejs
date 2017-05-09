@@ -11,9 +11,11 @@
 <% } %>
 </ul>
 
-<p class="account-message">
-  <a href="/routes/<%=albumn._id%>/edit">Edit</a>
-</p>
+<%if (currentUser.id == albumn.owner_id){ %>
+  <p class="account-message">
+    <a href="/routes/<%=albumn._id%>/edit">Edit</a>
+  </p>
+<%}%>
 
 <p class="account-message">
   <a href="/routes/<%=albumn.route_id%>/show">Go back to Route</a>
