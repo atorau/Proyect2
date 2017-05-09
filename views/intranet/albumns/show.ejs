@@ -1,16 +1,6 @@
 <h1><%= albumn.title %></h1>
 <p><strong>Title Albumn: </strong><%= albumn.title %></p>
 
-
-<section>
-  <h2>Upload your photo</h2>
-  <form action="/routes/<%= albumn._id %>/uploadalbumnimage" method="post" enctype="multipart/form-data">
-    <input type="text" name="name">
-    <input type="file" name="photo">
-    <input type="submit" value="Save">
-  </form>
-</section>
-
 <ul>
 <% if(albumn.pictures.length){ %>
 <%  albumn.pictures.forEach((picture)=>{ %>
@@ -20,6 +10,15 @@
 <% }) %>
 <% } %>
 </ul>
+
+<p class="account-message">
+  <a href="/routes/<%=albumn._id%>/edit">Edit</a>
+</p>
+
+<p class="account-message">
+  <a href="/routes/<%=albumn.route_id%>/show">Go back to Route</a>
+</p>
+
 <p class="account-message">
   <a href="/main">Main</a>
 </p>
