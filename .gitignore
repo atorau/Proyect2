@@ -26,6 +26,9 @@ build/Release
 # https://docs.npmjs.com/cli/shrinkwrap#caveats
 node_modules
 bower_components
+public/uploads
+public/pictures
+.env
 
 # Debug log from npm
 npm-debug.log

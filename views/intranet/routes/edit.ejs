@@ -1,0 +1,32 @@
+<h2>Edit your Route</h2>
+
+<form action="/routes/<%= route._id%>/edit" method="POST" id="form-container">
+  <label for="name">Name</label>
+  <input id="name" type="text" name="name" value="<%=route.name%>" required>
+  <br><br>
+  <label for="ubication">Ubication</label>
+  <input id="ubication" type="text" name="ubication" value="<%=route.ubication%>" required>
+  <br><br>
+  <label for="date">Date</label>
+  <input id="datenewroute" type="date" required name="date" value="">
+  <br><br>
+  <label for="description">Description</label>
+  <textarea name="description" rows="8" cols="80" value="<%= route.description%>" required> </textarea>
+  <br><br>
+  <button>Edit this Route</button>
+
+</form>
+  <section>
+    <h2>Change your Track File</h2>
+    <form class="track-route" route-id="<%= route._id %>" action="/routes/<%= route._id %>/uploadtrack" method="post" enctype="multipart/form-data">
+      <input type="file" name="track">
+      <input type="submit" value="Save">
+    </form>
+  </section>
+
+  <a href="/routes/<%=route._id%>/show">See your route <%=route.name%></a>
+
+
+  <script src="/jquery/dist/jquery.min.js"></script>
+  <script src="/jquery-ui/jquery-ui.min.js"></script>
+  <script src="/javascripts/dateinput.js"></script>

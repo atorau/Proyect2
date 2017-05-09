@@ -19,6 +19,7 @@ var siteController = require('./routes/siteController');
 var authController = require('./routes/authController');
 var profileController = require('./routes/profileController');
 var routeController = require('./routes/routeController');
+var APIroutes = require('./routes/APIroutes');
 
 var app = express();
 
@@ -57,6 +58,7 @@ app.use('/', siteController);
 app.use('/', authController);
 app.use('/', profileController);
 app.use('/', routeController);
+app.use('/apiRoutes', APIroutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

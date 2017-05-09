@@ -1,13 +1,22 @@
+
+<%if(typeof(user)!=='undefined'){%>
+  <section>
+      <img src="<%= user.picture.pic_path %>" alt="<%= user.picture.pic_name %>" />
+  </section>
+<% }%>
+
+
+
 <ul>
   <%if(typeof(user)!=='undefined'){%>
     <li>
       <p>
-        <%=user.name%>
+        <%=user.username%>
       </p>
     </li>
     <li>
       <p>
-        <%=user.username%>
+        <%=user.name%>
       </p>
     </li>
     <li>
@@ -22,6 +31,8 @@
     </li>
     <%}%>
 </ul>
+
+<a href="/<%= user.username%>/edit">Edit your profile</a>
 
 <h1>Profile WALL</h1>
 <ul>
@@ -57,7 +68,7 @@
 
 </form>
 
-<h1>AQUI LAS RUTAS</h1>
+<h1>Routes of <%= user.name%></h1>
 <ul>
   <% if(user.routes.length){ %>
     <% user.routes.forEach((route)=>{ %>
@@ -75,5 +86,5 @@
 
 
 <p class="main">
-  <a href="/main">Home</a>
+  <a href="/main">Main</a>
 </p>

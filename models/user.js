@@ -9,10 +9,12 @@ const userSchema = new Schema({
     email: String,
     password: String,
     ubication: String,
-    addess: String,
-    pic_path: String,
-    pic_name: String,
-    //
+    address: String,
+
+    picture: {
+      type: Schema.Types.ObjectId,
+      ref: "Picture"
+    },
     role: {
       type: String,
       enum: ['ADMIN', 'USER'],
