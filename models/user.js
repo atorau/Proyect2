@@ -9,7 +9,7 @@ const userSchema = new Schema({
     email: String,
     password: String,
     ubication: String,
-    addess: String,
+    address: String,
 
     picture: {
       type: Schema.Types.ObjectId,

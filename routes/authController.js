@@ -65,14 +65,14 @@ authController.get('/signup', auth.ifAlreadyLoggedIn('/main'), (req, res) => {
 
 authController.post('/signup', (req, res) => {
 
-  const username = req.body.username;
-  const name = req.body.name;
-  const lastName = req.body.lastName;
-  const email = req.body.email;
-  const password = req.body.password;
+  const username  = req.body.username;
+  const name      = req.body.name;
+  const lastName  = req.body.lastName;
+  const email     = req.body.email;
+  const role      = "USER";
+  const password  = req.body.password;
   const ubication = req.body.ubication;
-  const address = req.body.address;
-  const role = req.body.role;
+  const address   = req.body.address;
   let picture;
   let wall;
   let routes = [];
@@ -81,7 +81,7 @@ authController.post('/signup', (req, res) => {
   let messages = [];
   let conversations = [];
 
-  if (username === "" || email === "" || password === "" || role === "") {
+  if (username === "" || email === "" || password === "") {
     res.render("intranet/auth/sigmup", {
       message: "Indicate username, email, password and role"
     });

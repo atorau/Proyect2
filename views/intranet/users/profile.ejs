@@ -4,30 +4,19 @@
       <img src="<%= user.picture.pic_path %>" alt="<%= user.picture.pic_name %>" />
   </section>
 <% }%>
-<%if(typeof(user)!=='undefined'){%>
-  <%if (currentUser.username === user.username){ %>
-    <section>
-      <h2>Upload your photo</h2>
-      <form action="/uploadprofile" method="post" enctype="multipart/form-data">
-        <input type="text" name="name">
-        <input type="file" name="photo">
-        <input type="submit" value="Save">
-      </form>
-    </section>
-  <% }%>
-<% }%>
+
 
 
 <ul>
   <%if(typeof(user)!=='undefined'){%>
     <li>
       <p>
-        <%=user.name%>
+        <%=user.username%>
       </p>
     </li>
     <li>
       <p>
-        <%=user.username%>
+        <%=user.name%>
       </p>
     </li>
     <li>
@@ -42,6 +31,8 @@
     </li>
     <%}%>
 </ul>
+
+<a href="/<%= user.username%>/edit">Edit your profile</a>
 
 <h1>Profile WALL</h1>
 <ul>
@@ -95,5 +86,5 @@
 
 
 <p class="main">
-  <a href="/main">Home</a>
+  <a href="/main">Main</a>
 </p>
