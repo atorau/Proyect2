@@ -181,7 +181,6 @@ profileController.get('/:username/edit' , auth.ensureLoggedIn('/login'), (req,re
 });
 
 profileController.post('/:username/edit',auth.ensureLoggedIn('/login'),(req,res)=>{
-  console.log("por aqui esta entrando")
   const username = req.body.username;
   const name = req.body.name;
   const lastName = req.body.lastName;

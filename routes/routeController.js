@@ -1,6 +1,6 @@
 var dotenv = require('dotenv');
 dotenv.load();
-
+const moment  = require('moment');
 const express = require("express");
 const routeController = express.Router();
 const multer = require('multer');
@@ -31,12 +31,12 @@ let destDir = path.join(__dirname, '../public');
 //////////////////////////////////////////////////////////////
 
 routeController.get('/routes/new', auth.ensureLoggedIn('/login'), (req, res, next) => {
-  console.log('hola guapo!!!');
   res.render('intranet/routes/new');
 
 });
 
 routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next)=>{
+  console.log("date creation", req.body.date);
   let newRoute= {
     name:req.body.name,
     ubication: req.body.ubication,
@@ -270,6 +270,50 @@ routeController.get('/routes/index',auth.ensureLoggedIn('/login'),(req, res, nex
     res.render('intranet/routes/index',{routes:routes});
   });
 });
+
+routeController.get('/routes/:route_id/edit',auth.ensureLoggedIn('/login'), (req,res,next)=>{
+  let routeQuery=[{path: "comments"},{path: "albumn"},{path: "track"}];
+
+  Route.findById({_id: req.params.route_id}).populate(routeQuery).exec((err,route)=>{
+    if (err){
+      next (err);
+     }
+     res.render("intranet/routes/edit",{route: route, key: process.env.GOOGLE_KEY});
+
+  });
+});
+
+
+routeController.post('/routes/:route_id/edit',auth.ensureLoggedIn('/login'), (req,res,next)=>{
+console.log("date",req.body.date);
+
+  const name = req.body.name;
+  const ubication = req.body.ubication;
+  const date = req.body.date;
+  const description = req.body.description;
+  if (name === "" || ubication === ""|| date === ""||description === "" ) {
+    res.render("intranet/routes/edit",{route}, {
+      message: "Indicate name, ubication, date and description"
+    });
+    return;
+  }
+  const editedRoute={
+    name       :name,
+    ubication  :ubication,
+    date       :date,
+    description:description
+  };
+  Route.findByIdAndUpdate({_id:req.params.route_id},editedRoute,{new:true}, (err, route)=>{
+    if(err){
+      next(err);
+    }
+    Track.populate(route,{path: 'track'},(err,routeTrack)=>{
+      res.render('intranet/routes/edit',{route: routeTrack , message: "Route Edited"});
+      // res.redirect('/'+req.user.username+'/profile');
+    });
+  });
+ });
+
 
 
 
