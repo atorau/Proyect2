@@ -24,6 +24,12 @@ const passport = require("passport");
 
 const auth = require('../helpers/auth-helpers');
 
+/////////////////////////////FS FILES////////////////////////
+const fs = require('fs');
+const path = require('path');
+let destDir = path.join(__dirname, '../public');
+//////////////////////////////////////////////////////////////
+
 routeController.get('/routes/new', auth.ensureLoggedIn('/login'), (req, res, next) => {
   console.log('hola guapo!!!');
   res.render('intranet/routes/new');
@@ -126,7 +132,6 @@ routeController.post('/routes/:route_id/comment',auth.ensureLoggedIn('/login'), 
   });
 });
 
-
 routeController.get('/routes/:albumn_id/albumn',auth.ensureLoggedIn('/login'),(req,res, next)=>{
   Albumn.findById({_id: req.params.albumn_id}).populate("pictures").exec((err,albumn)=>{
     if(err){
@@ -138,29 +143,88 @@ routeController.get('/routes/:albumn_id/albumn',auth.ensureLoggedIn('/login'),(r
   });
 });
 
+//user control
+routeController.get('/routes/:albumn_id/edit',auth.ensureLoggedIn('/login'),(req,res, next)=>{
+  Albumn.findById({_id: req.params.albumn_id}).populate("pictures").exec((err,albumn)=>{
+    if(err){
+      next(err);
+    }
+    else{
+      res.render('intranet/albumns/edit',{albumn});
+    }
+  });
+});
+
+routeController.get('/routes/:albumn_id/delete-image/:picture_id',auth.ensureLoggedIn('/login'),(req,res, next)=>{
+  Albumn.findByIdAndUpdate({_id: req.params.albumn_id},{'$pull': {'pictures':{ '_id': req.params.picture_id }}},(err,albumn)=>{
+    if(err){
+      next(err);
+    }
+    else{
+      Picture.findById({_id: req.params.picture_id},(err,picture)=>{
+        fs.unlink(path.join(destDir, picture.pic_path), (err)=>{
+          if(err){
+              next(err);
+            }
+            else {
+              picture.remove((err, pictureRemoved)=>{
+                if(err){
+                  next(err);
+                }
+
+                Picture.populate(albumn,{path:'pictures'},(err,albumnPictures)=>{
+                  if(err){
+                    next(err);
+                  }
+                  res.render('intranet/albumns/edit',{albumn:albumnPictures});
+                });
+              });
+            }
+        });
+      });
+    }
+  });
+});
+
+
 routeController.post('/routes/:albumn_id/uploadalbumnimage', uploadPhoto.single('photo'), (req, res, next)=>{
   Albumn.findById({_id: req.params.albumn_id}, (err,albumn)=>{
     if(err){
       next(err);
     }
-    let newPicture = new Picture({
-      name: req.body.name,
-      pictureType: 'ALBUMN',
-      albumn_id: albumn._id,
-      route_id: albumn.route_id,
-      owner_id: albumn.owner_id,
-      pic_path: `/uploads/albumns/${req.file.filename}`,
-      pic_name: req.file.originalname
-    });
-    newPicture.save((err,picture) => {
+    if(req.file!== undefined){
+      let newPicture = new Picture({
+        name: req.body.name,
+        pictureType: 'ALBUMN',
+        albumn_id: albumn._id,
+        route_id: albumn.route_id,
+        owner_id: albumn.owner_id,
+        pic_path: `/uploads/albumns/${req.file.filename}`,
+        pic_name: req.file.originalname
+      });
+      newPicture.save((err,picture) => {
         albumn.pictures.push(picture);
         albumn.save((err, albumnUpdated)=>{
           if(err){
             next(err);
           }
-          res.redirect('/routes/'+ albumn._id +'/albumn');
+          Picture.populate(albumnUpdated,{path:"pictures"},(err,albumnPictures)=>{
+            if(err){
+              next(err);
+            }
+            res.render('intranet/albumns/edit',{albumn: albumnPictures});
+          });
+        });
       });
-    });
+    }
+    else {
+      Picture.populate(albumn,{path:"pictures"},(err,albumnPictures)=>{
+        if(err){
+          next(err);
+        }
+        res.render('intranet/albumns/edit',{albumn: albumnPictures});
+      });
+    }
   });
 });
 
