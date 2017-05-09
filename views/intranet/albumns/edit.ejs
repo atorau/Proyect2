@@ -3,7 +3,7 @@
 
 <section>
   <h2>Upload your photo</h2>
-  <form action="/routes/<%= albumn._id %>/uploadalbumnimage" method="post" enctype="multipart/form-data">
+  <form action="/routes/<%= albumn.route_id %>/albumns/<%= albumn._id %>/uploadalbumnimage" method="post" enctype="multipart/form-data">
     <input type="text" name="name">
     <input type="file" name="photo">
     <input type="submit" value="Save">
@@ -14,7 +14,7 @@
 <% if(albumn.pictures.length){ %>
 <%  albumn.pictures.forEach((picture)=>{ %>
     <li><section>
-      <img src="<%= picture.pic_path %>" alt="<%= picture.pic_name %>" /><a href="/routes/<%= albumn._id %>/delete-image/<%= picture._id %>">Delete</a>
+      <img src="<%= picture.pic_path %>" alt="<%= picture.pic_name %>" /><a href="/routes/<%= albumn.route_id %>/albumns/<%= albumn._id %>/delete-image/<%= picture._id %>">Delete</a>
     </section></li>
 <% }) %>
 <% } %>
@@ -22,5 +22,5 @@
 
 
 <p class="account-message">
-  <a href="/routes/<%= albumn._id %>/albumn">Return to album</a>
+  <a href="/routes/<%= albumn.route_id %>/albumns/<%= albumn._id %>/show">Return to album</a>
 </p>
