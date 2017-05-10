@@ -23,6 +23,7 @@ const Track = require("../models/track");
 const passport = require("passport");
 
 const auth = require('../helpers/auth-helpers');
+const googleHelper = require('../helpers/google-api');
 
 /////////////////////////////FS FILES////////////////////////
 const fs = require('fs');
@@ -70,6 +71,25 @@ routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next
           if(err){
             next(err);
           }
+          // var event = {
+          //   'summary': 'Prueba INSERT',
+          //   'location': 'UBICACION',
+          //   'description': 'PROBANDO INSERT',
+          //   'start': {
+          //         'date': "2017-05-21"
+          //   },
+          //   'end': {
+          //         'date': "2017-05-21"
+          //   },
+          // };
+          let data = {
+            event:{
+
+            },
+
+          };
+
+          googleHelper.insertEventHelper();
           res.redirect('/routes/'+ route._id+ '/show');
         });
       });
