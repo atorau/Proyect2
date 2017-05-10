@@ -38,10 +38,10 @@ const userSchema = new Schema({
 
     // comments: [[type : Schema.Types.ObjectId, ref: "Message"]],
 
-    messages: [{
-      type: Schema.Types.ObjectId,
-      ref: "Message"
-    }],
+    // messages: [{
+    //   type: Schema.Types.ObjectId,
+    //   ref: "Message"
+    // }],
 
     conversations: [{
       type: Schema.Types.ObjectId,

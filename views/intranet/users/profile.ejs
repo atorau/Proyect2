@@ -32,7 +32,7 @@
     <%}%>
 </ul>
 
-<a href="/<%= user.username%>/edit">Edit your profile</a>
+<a href="/profile/<%=user._id%>/edit">Edit your profile</a>
 
 <h1>Profile WALL</h1>
 <ul>
@@ -52,11 +52,10 @@
 </ul>
 
 
-<form action="/<%= user._id %>/profile/wallmessage" method="POST" id="form-container">
+<form action="/profile/<%=user._id%>/walls/<%=user.wall%>/messages/new" method="POST" id="form-container">
   <label for="wallText">Message: </label>
   <input id="wallText" type="text" name="wallText" placeholder="your text here" required>
   <br><br>
-
   <% if (typeof message !== "undefined") { %>
     <div class="error-message">
       <%= message %>
@@ -65,25 +64,19 @@
       <br><br>
 
       <button>New message</button>
-
 </form>
 
 <h1>Routes of <%= user.name%></h1>
 <ul>
   <% if(user.routes.length){ %>
     <% user.routes.forEach((route)=>{ %>
-          <li><a href="/routes/<%= route._id %>/show"><%= route.name %></a></li>
+          <li><a href="/routes/<%=route._id%>/show"><%= route.name %></a></li>
     <% })%>
   <% }%>
 </ul>
 <%if (currentUser.username === user.username){ %>
   <a href="/routes/new">New Route</a>
-
 <%}%>
-
-
-
-
 
 <p class="main">
   <a href="/main">Main</a>
