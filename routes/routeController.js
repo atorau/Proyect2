@@ -96,7 +96,6 @@ routeController.get('/routes/:route_id/show',auth.ensureLoggedIn('/login'), (req
   });
 });
 
-
 routeController.get('/routes/:route_id/edit',auth.ensureLoggedIn('/login'), (req,res,next)=>{
   Route.findById({_id: req.params.route_id}).populate("track").exec((err,route)=>{
     if (err){
@@ -136,74 +135,71 @@ routeController.post('/routes/:route_id/edit',auth.ensureLoggedIn('/login'), (re
     });
   });
  });
-
+//not good with async
 routeController.post('/routes/:route_id/delete',auth.ensureLoggedIn('/login'), (req,res,next)=>{
-  console.log("hi",req.params.route_id);
+  console.log("hi");
   Route.findByIdAndRemove({_id:req.params.route_id},(err,route)=>{
     if(err){
-      next(error);
+      next(err);
     }else{
-      console.log("hi route",route);
-      Albumn.findOneAndRemove({route_id:req.params.route_id},(err,albumn)=>{
+      Message.deleteMany({route_id:req.params.route_id},(err)=>{
         if(err){
-          next(error);
+          next(err);
         }else{
-          console.log("hi albumn",albumn);
-          Picture.find({albumn_id: albumn._id},(err,pictures)=>{
+          Albumn.findOneAndRemove({route_id:req.params.route_id},(err,albumn)=>{
             if(err){
-              next(error);
+              next(err);
             }else{
-              console.log("hi pictures");
-              if(pictures!==null){
-                console.log("hi pictures",pictures);
-                pictures.forEach((picture)=>{
-                  fs.unlink(path.join(destDir, picture.pic_path), (err)=>{
+              Picture.find({albumn_id: albumn._id},(err,pictures)=>{
+                if(err){
+                  next(err);
+                }else{
+                  if(pictures!==null){
+                    pictures.forEach((picture)=>{
+                      fs.unlink(path.join(destDir, picture.pic_path), (err)=>{
+                        if(err){
+                          next(err);
+                        }else{
+                          picture.remove((err)=>{
+                            if(err){
+                              next(err);
+                            }
+                          });
+                        }
+                      });
+                    });
+                  }
+                  Track.findOneAndRemove({route_id:req.params.route_id},(err,track)=>{
                     if(err){
                       next(err);
                     }else{
-                      picture.remove((err, pictureRemoved)=>{
-                        if(err){
-                          next(err);
-                        }
-                      });
-                    }
-                  });
-                });
-              }
-              Track.findOneAndRemove({route_id:req.params.route_id},(err,track)=>{
-                if(err){
-                  next(error);
-                }else{
-                  console.log("hi track",track);
-                  if(track!==null)
-                  {
-                    fs.unlink(path.join(destDir, track.file_path), (err)=>{
-                      if(err){
-                        next(err);
+                      if(track!==null)
+                      {
+                        fs.unlink(path.join(destDir, track.file_path), (err)=>{
+                          if(err){
+                            next(err);
+                          }else{
+                            User.findOneAndUpdate({_id:route.owner_id},{'$pull': {'routes': req.params.route_id, 'albumns': albumn._id,'tracks': track._id  }},{new:true},(err,user)=>{
+                              if(err){
+                                next(err);
+                              }else{
+                                res.redirect(`/profile/${user._id}/show`);
+                              }
+                            });
+                          }
+                        });
                       }else{
-                        User.findOneAndUpdate({_id:route.owner_id},{'$pull': {'routes': req.params.route_id, 'albumns': albumn._id,'tracks': track._id  }},{new:true},(err,user)=>{
+                        User.findOneAndUpdate({_id:route.owner_id},{'$pull': {'routes': req.params.route_id, 'albumns': albumn._id}},{new:true},(err,user)=>{
                           if(err){
                             next(err);
                           }
                           else{
-                            console.log("hi user",user);
-                            res.redirect(`/${user.username}/profile`);
+                            res.redirect(`/profile/${user._id}/show`);
                           }
                         });
                       }
-                    });
-                  }
-                  else{
-                    User.findOneAndUpdate({_id:route.owner_id},{'$pull': {'routes': req.params.route_id, 'albumns': albumn._id}},{new:true},(err,user)=>{
-                      if(err){
-                        next(err);
-                      }
-                      else{
-                        console.log("hi user",user);
-                        res.redirect(`/${user.username}/profile`);
-                      }
-                    });
-                  }
+                    }
+                  });
                 }
               });
             }
@@ -221,10 +217,13 @@ routeController.post('/routes/:route_id/comments/new',auth.ensureLoggedIn('/logi
     }
     let newComment ={
       message:req.body.comment,
+      owner_username: req.user.username,
       owner_id: req.user.id,
       dest_id: route.owner_id,
+      route_id: req.params.route_id,
       messageType: "ROUTE"
     };
+
     Message.create(newComment, (err, comment) => {
       if (err) {
         next(err);
@@ -234,14 +233,7 @@ routeController.post('/routes/:route_id/comments/new',auth.ensureLoggedIn('/logi
           if (err) {
             next (err);
           }else{
-            req.user.messages.push(comment);
-            req.user.save((err, updatedUser) => {
-              if (err) {
-                next (err);
-              }else{
-                return res.redirect('/routes/'+ updatedRoute._id +'/show');
-              }
-            });
+            return res.redirect('/routes/'+ updatedRoute._id +'/show');
           }
         });
       }
@@ -250,6 +242,7 @@ routeController.post('/routes/:route_id/comments/new',auth.ensureLoggedIn('/logi
 });
 
 routeController.post('/routes/:route_id/tracks/new', uploadTrack.single("track"),(req,res,next)=>{
+
   Route.findById({_id: req.params.route_id}).populate("tracks").exec((err,route)=>{
     if(err){
       next(err);
@@ -257,7 +250,6 @@ routeController.post('/routes/:route_id/tracks/new', uploadTrack.single("track")
     if(req.file!== undefined){
 
       if(route.track===undefined){
-
         let newTrack = new Track({
           name: route.name,
           file_path: `/uploads/tracks/${req.file.filename}`,
@@ -277,79 +269,66 @@ routeController.post('/routes/:route_id/tracks/new', uploadTrack.single("track")
             if(err){
               next(err);
             }
-            req.user.tracks.push(track);
-            req.user.save((err,userUpdated)=>{
-              if(err){
-                next(err);
-              }
-              Track.populate(routeUpdated,{path: 'track'},(err,routeTrack)=>{
-                res.render('intranet/routes/edit',{route: routeTrack, key: process.env.GOOGLE_KEY});
+            User.findById({_id:route.owner_id},(err,user)=>{
+              user.tracks.push(track);
+              user.save((err)=>{
+                if(err){
+                  next(err);
+                }
+                Track.populate(routeUpdated,{path: 'track'},(err,routeTrack)=>{
+                  res.render('intranet/routes/edit',{route: routeTrack, key: process.env.GOOGLE_KEY});
+                });
               });
             });
           });
         });
-      }
-      else{
-
-        Track.populate(route,{
-          path: "track"
-        }, (err, routeTrack) =>{
+      }else{
+        fs.unlink(path.join(destDir, route.track.file_path), (err)=>{
           if(err){
             next(err);
           }
+          else {
 
-          fs.unlink(path.join(destDir, routeTrack.track.file_path), (err)=>{
-            if(err){
-              next(err);
-            }
-            else {
+            let newTrack = new Track({
+              name: route.name,
+              file_path: `/uploads/tracks/${req.file.filename}`,
+              file_codename: req.file.filename,
+              file_name: req.file.originalname,
+              route_id : route._id,
+              owner_id : route.owner_id,
+              _id: route.track._id
+            });
 
-              let newTrack = new Track({
-                name: route.name,
-                file_path: `/uploads/tracks/${req.file.filename}`,
-                file_codename: req.file.filename,
-                file_name: req.file.originalname,
-                route_id : route._id,
-                owner_id : route.owner_id,
-                _id: routeTrack.track._id
-              });
-
-              Track.findByIdAndUpdate({_id:routeTrack.track._id}, newTrack ,{new:true}, (err,track)=>{
+            Track.findByIdAndUpdate({_id:routeTrack.track._id}, newTrack ,{new:true}, (err,track)=>{
+              if(err){
+                next(err);
+              }
+              route.track = track._id;
+              route.save((err,routeUpdated)=>{
                 if(err){
                   next(err);
                 }
-                route.track = track._id;
-                route.save((err,routeUpdated)=>{
+                //User.findByIdAndUpdate({_id: track.owner_id},{'$pull': {'tracks':{ '_id': track._id }}},(err,userUpdated)=>{
+                User.findByIdAndUpdate({_id: track.owner_id},{'$pull': {'tracks': track._id }},(err,userUpdated)=>{
                   if(err){
                     next(err);
                   }
-                  //User.findByIdAndUpdate({_id: track.owner_id},{'$pull': {'tracks':{ '_id': track._id }}},(err,userUpdated)=>{
-                  User.findByIdAndUpdate({_id: track.owner_id},{'$pull': {'tracks': track._id }},(err,userUpdated)=>{
+                  userUpdated.tracks.push(track);
+                  userUpdated.save((err)=>{
                     if(err){
                       next(err);
                     }
-                    userUpdated.tracks.push(track);
-                    userUpdated.save((err,userTrack)=>{
-                      if(err){
-                        next(err);
-                      }
-                      res.render('intranet/routes/edit',{route: routeUpdated, key: process.env.GOOGLE_KEY});
-                    });
+                    res.render('intranet/routes/edit',{route: routeUpdated, key: process.env.GOOGLE_KEY});
                   });
                 });
               });
-            }
-          });
+            });
+          }
         });
       }
     }else {
       console.log("hiiiiii-------------------------------");
-      Track.populate(route,{path:"track"},(err,routeTrack)=>{
-        if(err){
-          next(err);
-        }
-        res.render('intranet/routes/edit',{route: routeTrack, key: process.env.GOOGLE_KEY});
-      });
+      res.render('intranet/routes/edit',{route: route, key: process.env.GOOGLE_KEY});
     }
   });
 });
@@ -382,7 +361,6 @@ routeController.post('/routes/:route_id/tracks/:track_id/delete', uploadTrack.si
   });
 });
 
-
 routeController.get('/routes/:route_id/albumns/:albumn_id/show',auth.ensureLoggedIn('/login'),(req,res, next)=>{
   Albumn.findById({_id: req.params.albumn_id}).populate("pictures").exec((err,albumn)=>{
     if(err){
@@ -405,7 +383,7 @@ routeController.get('/routes/:route_id/albumns/:albumn_id/edit',auth.ensureLogge
   });
 });
 
-routeController.get('/routes/:route_id/albumns/:albumn_id/delete-image/:picture_id',auth.ensureLoggedIn('/login'),(req,res, next)=>{
+routeController.get('/routes/:route_id/albumns/:albumn_id/pictures/:picture_id/delete',auth.ensureLoggedIn('/login'),(req,res, next)=>{
   console.log("req.params.picture_id",req.params.picture_id);
   //Albumn.findByIdAndUpdate({_id: req.params.albumn_id},{'$pull': {'pictures':{ '_id': req.params.picture_id }}},(err,albumn)=>{
   Albumn.findByIdAndUpdate({_id: req.params.albumn_id},{'$pull': {'pictures': req.params.picture_id }},(err,albumn)=>{
@@ -440,7 +418,7 @@ routeController.get('/routes/:route_id/albumns/:albumn_id/delete-image/:picture_
   });
 });
 
-routeController.post('/routes/:route_id/albumns/:albumn_id/uploadalbumnimage', uploadPhoto.single('photo'), (req, res, next)=>{
+routeController.post('/routes/:route_id/albumns/:albumn_id/pictures/upload', uploadPhoto.single('photo'), (req, res, next)=>{
   Albumn.findById({_id: req.params.albumn_id}, (err,albumn)=>{
     if(err){
       next(err);

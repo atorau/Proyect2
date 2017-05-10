@@ -1,15 +1,19 @@
 <h2>Edit User</h2>
 
 <%if(typeof(user)!=='undefined'){%>
+  <form action="/profile/<%=user._id%>/delete" method="POST" id="form-container">
+    <button>Delete this User</button>
+  </form>
+
   <section>
       <img src="<%= user.picture.pic_path %>" alt="<%= user.picture.pic_name %>" />
   </section>
-<% }%>
-<%if(typeof(user)!=='undefined'){%>
+
+
   <%if (currentUser.username === user.username){ %>
     <section>
       <h2>Upload your photo</h2>
-      <form action="/uploadprofile" method="post" enctype="multipart/form-data">
+      <form action="/profile/<%=user._id%>/pictures/upload" method="post" enctype="multipart/form-data">
         <input type="file" name="photo">
         <input type="submit" value="Save">
       </form>
@@ -17,9 +21,7 @@
   <% }%>
 <% }%>
 
-
-
-<form action="/<%=user.username%>/edit" method='POST'>
+<form action="/<%=user._i%>/edit" method='POST'>
 
   <label for='username'>username</label>
   <input type='text' name='username' id='username' required value=<%=user.username%>>

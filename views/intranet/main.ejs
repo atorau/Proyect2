@@ -6,7 +6,7 @@
     <% users.forEach((user)=>{%>
       <li>
         <p>
-          <a href="/<%=user.username%>/profile">
+          <a href="/profile/<%=user._id%>/show">
             <%=user.username%>
           </a>
         </p>
@@ -36,7 +36,7 @@
             <%}%>
 
 </ul>
-<form action="/<%= wall._id %>/message" method="POST" id="form-container">
+<form action="/<%=wall._id%>/messages/new" method="POST" id="form-container">
   <label for="wallText">Message: </label>
   <input id="wallText" type="text" name="wallText" placeholder="your text here" required>
   <br><br>
@@ -51,9 +51,6 @@
       <button>New message</button>
 
 </form>
-
-
-
 
 <p class="account-message">
   <a href="/routes/index">See All the routes</a>
