@@ -1,5 +1,9 @@
 <h2>Edit your Route</h2>
 
+<form action="/routes/<%= route._id%>/delete" method="POST" id="form-container">
+  <button>Delete this Route</button>
+</form>
+
 <form action="/routes/<%= route._id%>/edit" method="POST" id="form-container">
   <label for="name">Name</label>
   <input id="name" type="text" name="name" value="<%=route.name%>" required>
@@ -14,15 +18,41 @@
   <textarea name="description" rows="8" cols="80" value="<%= route.description%>" required> </textarea>
   <br><br>
   <button>Edit this Route</button>
-
 </form>
+
+<% if(typeof(route.track) !== "undefined"){ %>
+    <section>
+      <h4><%= route.track.name %></h4>
+    </section>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js">
+    </script>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=<%=key%>">
+    </script>
+    <script type="text/javascript" src="/javascripts/APIHandler.js"></script>
+    <script type="text/javascript" src="/javascripts/loadgpx.js"></script>
+    <script type="text/javascript" src="/javascripts/gpxviewer.js"></script>
+    <div class="track-route" route-id="<%= route._id %>" id="map" style="width: 45%; height: 45%;"></div>
+<% } %>
+
   <section>
     <h2>Change your Track File</h2>
-    <form class="track-route" route-id="<%= route._id %>" action="/routes/<%= route._id %>/uploadtrack" method="post" enctype="multipart/form-data">
+    <form class="track-route" route-id="<%= route._id %>" action="/routes/<%= route._id %>/tracks/new" method="post" enctype="multipart/form-data">
       <input type="file" name="track">
       <input type="submit" value="Save">
     </form>
   </section>
+
+  <%if(typeof(route.track)!=='undefined'){%>
+  <section>
+    <h2>Delete Track File</h2>
+    <form action="/routes/<%= route._id %>/tracks/<%= route.track._id %>/delete" method="post">
+      <button type="submit">Delete Track</button>
+    </form>
+  </section>
+  <%}%>
+
+
 
   <a href="/routes/<%=route._id%>/show">See your route <%=route.name%></a>
 

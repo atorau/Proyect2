@@ -6,6 +6,7 @@ const messageSchema = new Schema({
     type: String,
     required: [true, "Message can't be empty"]
   },
+  owner_username: String,
   owner_id: {
   type: Schema.Types.ObjectId,
   ref: "User"
@@ -13,6 +14,18 @@ const messageSchema = new Schema({
   dest_id: {
     type: Schema.Types.ObjectId,
     ref: "User"
+  },
+  route_id: {
+    type: Schema.Types.ObjectId,
+    ref: "Route"
+  },
+  wall_id: {
+    type: Schema.Types.ObjectId,
+    ref: "Wall"
+  },
+  conversation_id: {
+    type: Schema.Types.ObjectId,
+    ref: "Conversation"
   },
   messageType: {
     type: String,

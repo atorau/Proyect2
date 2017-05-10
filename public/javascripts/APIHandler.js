@@ -9,7 +9,7 @@ class APIHandler {
       method: "GET",
       success: function (response) {
         console.log("hi2",response);
-        let filename =  "../.."+response;
+        let filename =  "../../../.."+response;
         console.log("filename",filename);
         loadGPXFileIntoGoogleMap(map, filename);
       },

@@ -13,6 +13,8 @@ const User = require("../models/user");
 const Wall = require("../models/wall");
 const Route = require("../models/route");
 const Message = require("../models/message");
+const Albumn = require("../models/albumn");
+const Track = require("../models/track");
 
 const passport = require("passport");
 
@@ -22,48 +24,40 @@ const auth = require('../helpers/auth-helpers');
 const bcrypt = require("bcrypt");
 const bcryptSalt = 10;
 
-
 /////////////////////////////FS FILES////////////////////////
 const fs = require('fs');
 const path = require('path');
 let destDir = path.join(__dirname, '../public');
 //////////////////////////////////////////////////////////////
 
-
-
-
-profileController.post('/uploadprofile', upload.single('photo'), (req, res, next)=>{
+profileController.post('/profile/:user_id/pictures/upload', upload.single('photo'), (req, res, next)=>{
 
   let newPicture ={
     name: req.body.name,
     pictureType: 'PROFILE',
     albumn_id: undefined,
-    owner_id: req.user.id,
+    owner_id: req.params.user_id,
     pic_path: `/uploads/${req.file.filename}`,
     pic_name: req.file.originalname
   };
 
-  Picture.populate(req.user,{
-    path: 'picture'
-  }, (err, userPicture) =>{
+  User.findById({_id: req.params.user_id }).populate("picture").exec((err,userPicture)=>{
     if(err){
       next(err);
     }
-
     fs.unlink(path.join(destDir, userPicture.picture.pic_path), (err)=>{
       if(err){
         next(err);
       }
       else {
         Picture.findByIdAndUpdate(userPicture.picture._id, newPicture ,{new:true}, (err,picture)=>{
-          req.user.picture = picture._id;
-          req.user.save((err, userUpdated)=>{
+          userPicture.picture = picture._id;
+          userPicture.save((err, userUpdated)=>{
             if(err){
               next(err);
             }
               Picture.populate(userUpdated,{path: 'picture'},(err,userPicture)=>{
               res.render('intranet/users/edit',{user: userUpdated , message: "Picture changed"});
-              // res.redirect('/'+req.user.username+'/profile');
             });
           });
         });
@@ -72,12 +66,10 @@ profileController.post('/uploadprofile', upload.single('photo'), (req, res, next
   });
 });
 
-profileController.get('/:username/profile', auth.ensureLoggedIn('/login'), (req, res, next) => {
+profileController.get('/profile/:user_id/show', auth.ensureLoggedIn('/login'), (req, res, next) => {
 
-  let username = req.params.username;
-
-  User.findOne({
-    username: req.params.username
+  User.findById({
+    _id: req.params.user_id
   }).populate('picture').exec((err, user) => {
     if (err) {
       next(err);
@@ -114,51 +106,32 @@ profileController.get('/:username/profile', auth.ensureLoggedIn('/login'), (req,
   });
 });
 
-profileController.post('/:user_id/profile/wallmessage', auth.ensureLoggedIn('/login'), (req, res, next) => {
-  console.log('ENTRADA 1');
+profileController.post('/profile/:user_id/walls/:wall_id/messages/new', auth.ensureLoggedIn('/login'), (req, res, next) => {
+
   let newMessage = {
     message: req.body.wallText,
+    owner_username: req.user.username,
     owner_id: req.user.id,
     dest_id: req.params.user_id,
+    wall_id: req.params.wall_id,
     messageType: "WALL"
   };
-  console.log('newMessage', newMessage);
-  User.findById({
-    _id: req.params.user_id
-  }).populate('wall').exec((err, userwall) => {
+
+  User.findById({_id: req.params.user_id}).populate('wall').exec((err, userwall) => {
     if(err){
       next(err);
     }
     else{
-
-      console.log('ENTRADA 2');
-      console.log('newMessage', newMessage);
-
       Message.create(newMessage, (err, message) => {
         if (err) {
-          console.log('no tengo ni puta idea de por que rompe aqui');
-          console.log('newMessage', newMessage);
           next(err);
         }else{
-        console.log('ENTRADA 3');
-        console.log('userwall', userwall);
-        console.log('userwall.wall', userwall.wall);
-
           userwall.wall.messages.push(message);
           userwall.wall.save((err, updatedWall) => {
             if (err) {
               next (err);
             }else{
-              console.log('updatedWall', updatedWall);
-              req.user.messages.push(message);
-              req.user.save((err, updatedUser) => {
-                if (err) {
-                  next (err);
-                }else{
-                  console.log('updatedUser', updatedUser);
-                  return res.redirect('/'+ userwall.username +'/profile');
-                }
-              });
+              return res.redirect('/profile/'+ userwall._id+'/show');
             }
           });
         }
@@ -166,21 +139,17 @@ profileController.post('/:user_id/profile/wallmessage', auth.ensureLoggedIn('/lo
     }
   });
 });
-////////////////////////////////NEW ROUTE///////////////////////////
 
-profileController.get('/:username/edit' , auth.ensureLoggedIn('/login'), (req,res,next)=>{
-  User.findOne({username: req.params.username }).populate("picture").exec ((err, user)=>{
+profileController.get('/profile/:user_id/edit' , auth.ensureLoggedIn('/login'), (req,res,next)=>{
+  User.findById({_id: req.params.user_id }).populate("picture").exec ((err, user)=>{
     if(err){
       next(err);
     }
-    console.log("///////////////////////////+++++++++++++++++");
-    console.log("user", user);
     res.render('intranet/users/edit',{user});
   });
-
 });
 
-profileController.post('/:username/edit',auth.ensureLoggedIn('/login'),(req,res)=>{
+profileController.post('/profile/:user_id/edit',auth.ensureLoggedIn('/login'),(req,res,next)=>{
   const username = req.body.username;
   const name = req.body.name;
   const lastName = req.body.lastName;
@@ -196,16 +165,24 @@ profileController.post('/:username/edit',auth.ensureLoggedIn('/login'),(req,res)
     return;
   }
   User.find({$or:[{username:username},{email:email}]}, "username email", (err, users) => {
-    if (users.length){
-      users.forEach((user)=>{
-        if(user._id != req.user.id && (req.user.username === user.username|| req.user.email === user.email)){
-          res.render("intranet/users/edit", {
-            message: "The username or email already exists"
-          });
-          return;
-        }
-      });
+    if(err){
+      next(err);
     }
+    User.findById({_id:req.params.user_id},(err,userEdited)=>{
+      if(err){
+        next(err);
+      }
+      if (users.length){
+        users.forEach((user)=>{
+          if(user._id != userEdited._id && (userEdited.username === user.username|| userEdited.email === user.email)){
+            res.render("intranet/users/edit", {
+              message: "The username or email already exists"
+            });
+            return;
+          }
+        });
+      }
+    });
     const salt = bcrypt.genSaltSync(bcryptSalt);
     const hashPass = bcrypt.hashSync(password, salt);
 
@@ -218,21 +195,104 @@ profileController.post('/:username/edit',auth.ensureLoggedIn('/login'),(req,res)
       ubication: ubication,
       address: address
     };
-    console.log("la estamos liando aqui?");
-    User.findOneAndUpdate({username:req.params.username},editedUser,{new:true}, (err, user)=>{
+
+    User.findByIdAndUpdate({_id:req.params.user_id},editedUser,{new:true}, (err, user)=>{
       if(err){
         next(err);
       }
-      req.user = user;
       Picture.populate(user,{path: 'picture'},(err,userPicture)=>{
         res.render('intranet/users/edit',{user: userPicture , message: "User Edited"});
-        // res.redirect('/'+req.user.username+'/profile');
       });
     });
   });
 });
-
-
-
+//not good with async
+profileController.post('/profile/:user_id/delete',auth.ensureLoggedIn('/login'),(req,res,next)=>{
+  User.findByIdAndRemove({_id:req.params.user_id},(err,user)=>{
+    if(err){
+      next(err);
+    }
+    Route.find({owner_id:user._id},(err,routes)=>{
+      if(err){
+        next(err);
+      }
+      if(routes!==null){
+        routes.forEach((route)=>{
+          Message.deleteMany({route_id: route._id},(err)=>{
+            if(err){
+              next(err);
+            }
+          });
+        });
+      }
+      Route.deleteMany({owner_id:user._id},(err)=>{
+        if(err){
+          next(err);
+        }
+        Albumn.deleteMany({owner_id:user._id},(err)=>{
+          if(err){
+            next(err);
+          }
+          Wall.findOne({owner_id:user._id},(err,wall)=>{
+            if(err){
+              next(err);
+            }
+            Message.deleteMany({wall_id: wall._id },(err)=>{
+              if(err){
+                next(err);
+              }
+              wall.remove((err, pictureRemoved)=>{
+                if(err){
+                  next(err);
+                }
+                Picture.find({owner_id: user._id},(err,pictures)=>{
+                  if(err){
+                    next(err);
+                  }
+                  if(pictures!==null){
+                    pictures.forEach((picture)=>{
+                      fs.unlink(path.join(destDir, picture.pic_path), (err)=>{
+                        if(err){
+                          next(err);
+                        }else{
+                          picture.remove((err, pictureRemoved)=>{
+                            if(err){
+                              next(err);
+                            }
+                          });
+                        }
+                      });
+                    });
+                  }
+                  Track.find({owner_id: user._id},(err,tracks)=>{
+                    if(err){
+                      next(err);
+                    }
+                    if(tracks!==null){
+                      tracks.forEach((track)=>{
+                        fs.unlink(path.join(destDir, track.file_path), (err)=>{
+                          if(err){
+                            next(err);
+                          }else{
+                            track.remove((err)=>{
+                              if(err){
+                                next(err);
+                              }
+                            });
+                          }
+                        });
+                      });
+                    }
+                    res.redirect(`/main`);
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+});
 
 module.exports = profileController;

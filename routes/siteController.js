@@ -28,11 +28,6 @@ siteController.get('/history', (req, res, next) => {
   res.render('history');
 });
 
-
-siteController.get('/intranet', auth.ensureLoggedIn('/login'), (req, res, next) => {
-
-});
-
 siteController.get('/main', auth.ensureLoggedIn('/login'), (req, res, next) => {
 
   Wall.findOne({
@@ -55,8 +50,8 @@ siteController.get('/main', auth.ensureLoggedIn('/login'), (req, res, next) => {
 
 });
 
-siteController.post('/:wall_id/message', auth.ensureLoggedIn('/login'), (req, res, next) => {
-  console.log('params ', req.params.wall_id);
+siteController.post('/:wall_id/messages/new', auth.ensureLoggedIn('/login'), (req, res, next) => {
+
   Wall.findById({
     _id: req.params.wall_id
   }, (err, wall) => {
@@ -65,8 +60,10 @@ siteController.post('/:wall_id/message', auth.ensureLoggedIn('/login'), (req, re
     }
     let newMessage = {
       message: req.body.wallText,
+      owner_name: req.user.username,
       owner_id: req.user,
       dest_id: undefined,
+      wall_id: req.params.wall_id,
       messageType: "GLOBAL"
     };
 
@@ -74,22 +71,12 @@ siteController.post('/:wall_id/message', auth.ensureLoggedIn('/login'), (req, re
       if (err) {
         next(err);
       }
-
       wall.messages.push(message);
       wall.save((err, updatedWall) => {
         if (err) {
           throw err;
         }
-
-        console.log('updatedWall', updatedWall);
-        req.user.messages.push(message);
-        req.user.save((err, updatedUser) => {
-          if (err) {
-            throw err;
-          }
-          console.log('updatedUser', updatedUser);
-          res.redirect('/main');
-        });
+        res.redirect('/main');
       });
     });
   });

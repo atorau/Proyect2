@@ -32,11 +32,9 @@ let destDir = path.join(__dirname, '../public');
 
 routeController.get('/routes/new', auth.ensureLoggedIn('/login'), (req, res, next) => {
   res.render('intranet/routes/new');
-
 });
 
 routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next)=>{
-  console.log("date creation", req.body.date);
   let newRoute= {
     name:req.body.name,
     ubication: req.body.ubication,
@@ -47,7 +45,6 @@ routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next
     albumn: undefined,
     track:undefined
   };
-///////////////////////////////////////////////////////////////
   Route.create(newRoute,(err, route)=>{
     if(err){
       next(err);
@@ -80,170 +77,6 @@ routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next
   });
 });
 
-routeController.get('/routes/:route_id/show',auth.ensureLoggedIn('/login'), (req,res,next)=>{
-
-  console.log('por aqui pasa');
-  let routeQuery=[{path: "comments"},{path: "albumn"},{path: "track"}];
-
-  Route.findById({_id: req.params.route_id}).populate(routeQuery).exec((err,route)=>{
-    if (err){
-      next (err);
-    }
-    console.log("route",route);
-    console.log("++++++++++++++++++++++++++++++++++++++");
-    console.log("key", process.env.GOOGLE_KEY);
-    res.render("intranet/routes/show",{route: route, key: process.env.GOOGLE_KEY});
-  });
-});
-
-
-routeController.post('/routes/:route_id/comments/new',auth.ensureLoggedIn('/login'), (req,res,next)=>{
-  Route.findById({_id: req.params.route_id}, (err,route)=>{
-    if(err){
-      next(err);
-    }
-    let newComment ={
-      message:req.body.comment,
-      owner_id: req.user.id,
-      dest_id: route.owner_id,
-      messageType: "ROUTE"
-    };
-    Message.create(newComment, (err, comment) => {
-      if (err) {
-        next(err);
-      }else{
-        route.comments.push(comment);
-        route.save((err, updatedRoute) => {
-          if (err) {
-            next (err);
-          }else{
-            req.user.messages.push(comment);
-            req.user.save((err, updatedUser) => {
-              if (err) {
-                next (err);
-              }else{
-                return res.redirect('/routes/'+ updatedRoute._id +'/show');
-              }
-            });
-          }
-        });
-      }
-    });
-  });
-});
-
-
-routeController.post('/routes/:route_id/uploadtrack', uploadTrack.single("track"),(req,res,next)=>{
-  Route.findById({_id: req.params.route_id}, (err,route)=>{
-    if(err){
-      next(err);
-    }
-    if(req.file!== undefined){
-
-      if(route.track===undefined){
-
-        let newTrack = new Track({
-          name: route.name,
-          file_path: `/uploads/tracks/${req.file.filename}`,
-          file_name: req.file.originalname,
-          route_id : route._id,
-          owner_id : route.owner_id
-        });
-
-        newTrack.save((err,track)=>{
-          if(err){
-            next(err);
-          }
-          route.track = track._id;
-          console.log("NEW TRACK--------",track);
-          console.log("ROUTE--------",route);
-          route.save((err,routeUpdated)=>{
-            if(err){
-              next(err);
-            }
-            req.user.tracks.push(track);
-            req.user.save((err,userUpdated)=>{
-              if(err){
-                next(err);
-              }
-              res.render('intranet/routes/show',{route: routeUpdated, key: process.env.GOOGLE_KEY});
-            });
-          });
-        });
-      }
-      else{
-
-        Track.populate(route,{
-          path: "track"
-        }, (err, routeTrack) =>{
-          if(err){
-            next(err);
-          }
-
-          fs.unlink(path.join(destDir, routeTrack.track.file_path), (err)=>{
-            if(err){
-              next(err);
-            }
-            else {
-              console.log("routeTrack----------------------",routeTrack);
-              Track.find({},(err,tracks)=>{
-                console.log("tracks-----------",tracks);
-              });
-
-              let newTrack = new Track({
-                name: route.name,
-                file_path: `/uploads/tracks/${req.file.filename}`,
-                file_name: req.file.originalname,
-                route_id : route._id,
-                owner_id : route.owner_id,
-                _id: routeTrack.track._id
-              });
-
-
-              Track.findByIdAndUpdate({_id:routeTrack.track._id}, newTrack ,{new:true}, (err,track)=>{
-                if(err){
-                  next(err);
-                  console.log("error------------------------");
-                }
-                console.log("hi------------------------");
-                console.log("track",track);
-                  console.log("hi------------------------2");
-                route.track = track._id;
-                console.log("hi------------------------2");
-                route.save((err,routeUpdated)=>{
-                  if(err){
-                    next(err);
-                  }
-                  //User.findByIdAndUpdate({_id: track.owner_id},{'$pull': {'tracks':{ '_id': track._id }}},(err,userUpdated)=>{
-                  User.findByIdAndUpdate({_id: track.owner_id},{'$pull': {'tracks': track._id }},(err,userUpdated)=>{
-                    if(err){
-                      next(err);
-                    }
-                    userUpdated.tracks.push(track);
-                    userUpdated.save((err,userTrack)=>{
-                      if(err){
-                        next(err);
-                      }
-                      res.render('intranet/routes/show',{route: routeUpdated, key: process.env.GOOGLE_KEY});
-                    });
-                  });
-                });
-              });
-            }
-          });
-        });
-      }
-    }else {
-      Track.populate(route,{path:"track"},(err,routeTrack)=>{
-        if(err){
-          next(err);
-        }
-        res.render('intranet/routes/show',{route: routeTrack, key: process.env.GOOGLE_KEY});
-      });
-    }
-  });
-});
-
 routeController.get('/routes/index',auth.ensureLoggedIn('/login'),(req, res, next)=>{
   Route.find({}, (err,routes)=>{
     if(err){
@@ -253,21 +86,29 @@ routeController.get('/routes/index',auth.ensureLoggedIn('/login'),(req, res, nex
   });
 });
 
-routeController.get('/routes/:route_id/edit',auth.ensureLoggedIn('/login'), (req,res,next)=>{
+routeController.get('/routes/:route_id/show',auth.ensureLoggedIn('/login'), (req,res,next)=>{
   let routeQuery=[{path: "comments"},{path: "albumn"},{path: "track"}];
   Route.findById({_id: req.params.route_id}).populate(routeQuery).exec((err,route)=>{
     if (err){
       next (err);
-     }
-     res.render("intranet/routes/edit",{route: route, key: process.env.GOOGLE_KEY});
-
+    }
+    res.render("intranet/routes/show",{route: route, key: process.env.GOOGLE_KEY});
   });
 });
 
+routeController.get('/routes/:route_id/edit',auth.ensureLoggedIn('/login'), (req,res,next)=>{
+  Route.findById({_id: req.params.route_id}).populate("track").exec((err,route)=>{
+    if (err){
+      next (err);
+     }
+     else{
+       console.log("route",route);
+       res.render("intranet/routes/edit",{route: route, key: process.env.GOOGLE_KEY});
+     }
+  });
+});
 
 routeController.post('/routes/:route_id/edit',auth.ensureLoggedIn('/login'), (req,res,next)=>{
-console.log("date",req.body.date);
-
   const name = req.body.name;
   const ubication = req.body.ubication;
   const date = req.body.date;
@@ -289,14 +130,236 @@ console.log("date",req.body.date);
       next(err);
     }
     Track.populate(route,{path: 'track'},(err,routeTrack)=>{
-      res.render('intranet/routes/edit',{route: routeTrack , message: "Route Edited"});
+      res.render('intranet/routes/edit',{route: routeTrack , message: "Route Edited", key: process.env.GOOGLE_KEY});
       // res.redirect('/'+req.user.username+'/profile');
     });
   });
  });
+//not good with async
+routeController.post('/routes/:route_id/delete',auth.ensureLoggedIn('/login'), (req,res,next)=>{
+  console.log("hi");
+  Route.findByIdAndRemove({_id:req.params.route_id},(err,route)=>{
+    if(err){
+      next(err);
+    }else{
+      Message.deleteMany({route_id:req.params.route_id},(err)=>{
+        if(err){
+          next(err);
+        }else{
+          Albumn.findOneAndRemove({route_id:req.params.route_id},(err,albumn)=>{
+            if(err){
+              next(err);
+            }else{
+              Picture.find({albumn_id: albumn._id},(err,pictures)=>{
+                if(err){
+                  next(err);
+                }else{
+                  if(pictures!==null){
+                    pictures.forEach((picture)=>{
+                      fs.unlink(path.join(destDir, picture.pic_path), (err)=>{
+                        if(err){
+                          next(err);
+                        }else{
+                          picture.remove((err)=>{
+                            if(err){
+                              next(err);
+                            }
+                          });
+                        }
+                      });
+                    });
+                  }
+                  Track.findOneAndRemove({route_id:req.params.route_id},(err,track)=>{
+                    if(err){
+                      next(err);
+                    }else{
+                      if(track!==null)
+                      {
+                        fs.unlink(path.join(destDir, track.file_path), (err)=>{
+                          if(err){
+                            next(err);
+                          }else{
+                            User.findOneAndUpdate({_id:route.owner_id},{'$pull': {'routes': req.params.route_id, 'albumns': albumn._id,'tracks': track._id  }},{new:true},(err,user)=>{
+                              if(err){
+                                next(err);
+                              }else{
+                                res.redirect(`/profile/${user._id}/show`);
+                              }
+                            });
+                          }
+                        });
+                      }else{
+                        User.findOneAndUpdate({_id:route.owner_id},{'$pull': {'routes': req.params.route_id, 'albumns': albumn._id}},{new:true},(err,user)=>{
+                          if(err){
+                            next(err);
+                          }
+                          else{
+                            res.redirect(`/profile/${user._id}/show`);
+                          }
+                        });
+                      }
+                    }
+                  });
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+  });
+});
 
+routeController.post('/routes/:route_id/comments/new',auth.ensureLoggedIn('/login'), (req,res,next)=>{
+  Route.findById({_id: req.params.route_id}, (err,route)=>{
+    if(err){
+      next(err);
+    }
+    let newComment ={
+      message:req.body.comment,
+      owner_username: req.user.username,
+      owner_id: req.user.id,
+      dest_id: route.owner_id,
+      route_id: req.params.route_id,
+      messageType: "ROUTE"
+    };
 
+    Message.create(newComment, (err, comment) => {
+      if (err) {
+        next(err);
+      }else{
+        route.comments.push(comment);
+        route.save((err, updatedRoute) => {
+          if (err) {
+            next (err);
+          }else{
+            return res.redirect('/routes/'+ updatedRoute._id +'/show');
+          }
+        });
+      }
+    });
+  });
+});
 
+routeController.post('/routes/:route_id/tracks/new', uploadTrack.single("track"),(req,res,next)=>{
+
+  Route.findById({_id: req.params.route_id}).populate("tracks").exec((err,route)=>{
+    if(err){
+      next(err);
+    }
+    if(req.file!== undefined){
+
+      if(route.track===undefined){
+        let newTrack = new Track({
+          name: route.name,
+          file_path: `/uploads/tracks/${req.file.filename}`,
+          file_codename: req.file.filename,
+          file_name: req.file.originalname,
+          route_id : route._id,
+          owner_id : route.owner_id
+        });
+
+        newTrack.save((err,track)=>{
+          if(err){
+            next(err);
+          }
+          route.track = track._id;
+
+          route.save((err,routeUpdated)=>{
+            if(err){
+              next(err);
+            }
+            User.findById({_id:route.owner_id},(err,user)=>{
+              user.tracks.push(track);
+              user.save((err)=>{
+                if(err){
+                  next(err);
+                }
+                Track.populate(routeUpdated,{path: 'track'},(err,routeTrack)=>{
+                  res.render('intranet/routes/edit',{route: routeTrack, key: process.env.GOOGLE_KEY});
+                });
+              });
+            });
+          });
+        });
+      }else{
+        fs.unlink(path.join(destDir, route.track.file_path), (err)=>{
+          if(err){
+            next(err);
+          }
+          else {
+
+            let newTrack = new Track({
+              name: route.name,
+              file_path: `/uploads/tracks/${req.file.filename}`,
+              file_codename: req.file.filename,
+              file_name: req.file.originalname,
+              route_id : route._id,
+              owner_id : route.owner_id,
+              _id: route.track._id
+            });
+
+            Track.findByIdAndUpdate({_id:routeTrack.track._id}, newTrack ,{new:true}, (err,track)=>{
+              if(err){
+                next(err);
+              }
+              route.track = track._id;
+              route.save((err,routeUpdated)=>{
+                if(err){
+                  next(err);
+                }
+                //User.findByIdAndUpdate({_id: track.owner_id},{'$pull': {'tracks':{ '_id': track._id }}},(err,userUpdated)=>{
+                User.findByIdAndUpdate({_id: track.owner_id},{'$pull': {'tracks': track._id }},(err,userUpdated)=>{
+                  if(err){
+                    next(err);
+                  }
+                  userUpdated.tracks.push(track);
+                  userUpdated.save((err)=>{
+                    if(err){
+                      next(err);
+                    }
+                    res.render('intranet/routes/edit',{route: routeUpdated, key: process.env.GOOGLE_KEY});
+                  });
+                });
+              });
+            });
+          }
+        });
+      }
+    }else {
+      console.log("hiiiiii-------------------------------");
+      res.render('intranet/routes/edit',{route: route, key: process.env.GOOGLE_KEY});
+    }
+  });
+});
+
+routeController.post('/routes/:route_id/tracks/:track_id/delete', uploadTrack.single("track"),(req,res,next)=>{
+  console.log("hi1");
+  Route.findByIdAndUpdate({_id: req.params.route_id}, { $unset: { track: ""} },{new:true},(err,routeUpdated)=>{
+    if(err){
+      next(err);
+    }
+    else{
+      Track.findByIdAndRemove({_id: req.params.track_id},(err,track)=>{
+        if(err){
+          next(err);
+        }
+        else{
+          fs.unlink(path.join(destDir, track.file_path), (err)=>{
+            if(err){
+              next(err);
+            }
+            else{
+              User.findByIdAndUpdate({_id:track.owner_id},{'$pull': {'tracks': track._id }},(err,userUpdated)=>{
+                res.render('intranet/routes/edit',{route: routeUpdated, key: process.env.GOOGLE_KEY});
+              });
+            }
+          });
+        }
+      });
+    }
+  });
+});
 
 routeController.get('/routes/:route_id/albumns/:albumn_id/show',auth.ensureLoggedIn('/login'),(req,res, next)=>{
   Albumn.findById({_id: req.params.albumn_id}).populate("pictures").exec((err,albumn)=>{
@@ -309,7 +372,6 @@ routeController.get('/routes/:route_id/albumns/:albumn_id/show',auth.ensureLogge
   });
 });
 
-//user control
 routeController.get('/routes/:route_id/albumns/:albumn_id/edit',auth.ensureLoggedIn('/login'),(req,res, next)=>{
   Albumn.findById({_id: req.params.albumn_id}).populate("pictures").exec((err,albumn)=>{
     if(err){
@@ -321,7 +383,7 @@ routeController.get('/routes/:route_id/albumns/:albumn_id/edit',auth.ensureLogge
   });
 });
 
-routeController.get('/routes/:route_id/albumns/:albumn_id/delete-image/:picture_id',auth.ensureLoggedIn('/login'),(req,res, next)=>{
+routeController.get('/routes/:route_id/albumns/:albumn_id/pictures/:picture_id/delete',auth.ensureLoggedIn('/login'),(req,res, next)=>{
   console.log("req.params.picture_id",req.params.picture_id);
   //Albumn.findByIdAndUpdate({_id: req.params.albumn_id},{'$pull': {'pictures':{ '_id': req.params.picture_id }}},(err,albumn)=>{
   Albumn.findByIdAndUpdate({_id: req.params.albumn_id},{'$pull': {'pictures': req.params.picture_id }},(err,albumn)=>{
@@ -329,8 +391,10 @@ routeController.get('/routes/:route_id/albumns/:albumn_id/delete-image/:picture_
       next(err);
     }
     else{
-      console.log("albumn--------------",albumn);
       Picture.findById({_id: req.params.picture_id},(err,picture)=>{
+        if(err){
+          next(err);
+        }
         fs.unlink(path.join(destDir, picture.pic_path), (err)=>{
           if(err){
               next(err);
@@ -340,7 +404,6 @@ routeController.get('/routes/:route_id/albumns/:albumn_id/delete-image/:picture_
                 if(err){
                   next(err);
                 }
-
                 Picture.populate(albumn,{path:'pictures'},(err,albumnPictures)=>{
                   if(err){
                     next(err);
@@ -355,8 +418,7 @@ routeController.get('/routes/:route_id/albumns/:albumn_id/delete-image/:picture_
   });
 });
 
-
-routeController.post('/routes/:route_id/albumns/:albumn_id/uploadalbumnimage', uploadPhoto.single('photo'), (req, res, next)=>{
+routeController.post('/routes/:route_id/albumns/:albumn_id/pictures/upload', uploadPhoto.single('photo'), (req, res, next)=>{
   Albumn.findById({_id: req.params.albumn_id}, (err,albumn)=>{
     if(err){
       next(err);
@@ -396,6 +458,5 @@ routeController.post('/routes/:route_id/albumns/:albumn_id/uploadalbumnimage', u
     }
   });
 });
-
 
 module.exports= routeController;
