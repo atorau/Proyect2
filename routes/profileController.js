@@ -22,15 +22,11 @@ const auth = require('../helpers/auth-helpers');
 const bcrypt = require("bcrypt");
 const bcryptSalt = 10;
 
-
 /////////////////////////////FS FILES////////////////////////
 const fs = require('fs');
 const path = require('path');
 let destDir = path.join(__dirname, '../public');
 //////////////////////////////////////////////////////////////
-
-
-
 
 profileController.post('/uploadprofile', upload.single('photo'), (req, res, next)=>{
 
@@ -115,47 +111,33 @@ profileController.get('/:username/profile', auth.ensureLoggedIn('/login'), (req,
 });
 
 profileController.post('/:user_id/profile/wallmessage', auth.ensureLoggedIn('/login'), (req, res, next) => {
-  console.log('ENTRADA 1');
+
   let newMessage = {
     message: req.body.wallText,
     owner_id: req.user.id,
     dest_id: req.params.user_id,
     messageType: "WALL"
   };
-  console.log('newMessage', newMessage);
-  User.findById({
-    _id: req.params.user_id
-  }).populate('wall').exec((err, userwall) => {
+
+  User.findById({_id: req.params.user_id}).populate('wall').exec((err, userwall) => {
     if(err){
       next(err);
     }
     else{
-
-      console.log('ENTRADA 2');
-      console.log('newMessage', newMessage);
-
       Message.create(newMessage, (err, message) => {
         if (err) {
-          console.log('no tengo ni puta idea de por que rompe aqui');
-          console.log('newMessage', newMessage);
           next(err);
         }else{
-        console.log('ENTRADA 3');
-        console.log('userwall', userwall);
-        console.log('userwall.wall', userwall.wall);
-
           userwall.wall.messages.push(message);
           userwall.wall.save((err, updatedWall) => {
             if (err) {
               next (err);
             }else{
-              console.log('updatedWall', updatedWall);
               req.user.messages.push(message);
               req.user.save((err, updatedUser) => {
                 if (err) {
                   next (err);
                 }else{
-                  console.log('updatedUser', updatedUser);
                   return res.redirect('/'+ userwall.username +'/profile');
                 }
               });
@@ -173,8 +155,6 @@ profileController.get('/:username/edit' , auth.ensureLoggedIn('/login'), (req,re
     if(err){
       next(err);
     }
-    console.log("///////////////////////////+++++++++++++++++");
-    console.log("user", user);
     res.render('intranet/users/edit',{user});
   });
 
@@ -218,7 +198,7 @@ profileController.post('/:username/edit',auth.ensureLoggedIn('/login'),(req,res)
       ubication: ubication,
       address: address
     };
-    console.log("la estamos liando aqui?");
+
     User.findOneAndUpdate({username:req.params.username},editedUser,{new:true}, (err, user)=>{
       if(err){
         next(err);
@@ -231,8 +211,5 @@ profileController.post('/:username/edit',auth.ensureLoggedIn('/login'),(req,res)
     });
   });
 });
-
-
-
 
 module.exports = profileController;

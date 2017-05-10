@@ -16,5 +16,5 @@ const trackSchema = new Schema({
 
 });
 
-const Track = mongoose.model("Track", trackSchema);
+var Track = mongoose.model("Track", trackSchema);
 module.exports = Track;
