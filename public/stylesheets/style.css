@@ -10,3 +10,55 @@ a {
 .albumn-pictures{
   float: left;
 }
+#myCarousel{
+  width: 100%;
+
+}
+.active{
+  width: auto;
+  height: auto;
+}
+
+.imageblock{
+  width: 100%;
+}
+.Container{
+  min-height: 450px;
+}
+.Albumn{
+  min-height: 300px;
+}
+.item-list {
+  display: flex;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.single-item {
+  padding: 0;
+  margin: 0;
+  height: 450px;
+  margin: 15px 12px;
+  width: 31%;
+}
+
+.single-item-img {
+  display: inline-block;
+  width: 100%;
+  height: 350px;
+  position: relative;
+}
+
+.footer {
+   background:#F8F8F8;
+ }
+
+.footer2 {
+  background: black;
+  height: 60px;
+}
+
+#justpushtobottom {
+    height: 30vh;
+}
