@@ -1,5 +1,9 @@
 <h2>Edit your Route</h2>
 
+<form action="/routes/<%= route._id%>/delete" method="POST" id="form-container">
+  <button>Delete this Route</button>
+</form>
+
 <form action="/routes/<%= route._id%>/edit" method="POST" id="form-container">
   <label for="name">Name</label>
   <input id="name" type="text" name="name" value="<%=route.name%>" required>
@@ -16,7 +20,7 @@
   <button>Edit this Route</button>
 </form>
 
-<% if(typeof(route.track) !== "undefined" && route.track!==null){ %>
+<% if(typeof(route.track) !== "undefined"){ %>
     <section>
       <h4><%= route.track.name %></h4>
     </section>
