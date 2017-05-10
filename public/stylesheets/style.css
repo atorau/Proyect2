@@ -62,3 +62,7 @@ a {
 #justpushtobottom {
     height: 30vh;
 }
+.vertical-center-row {
+    display: table-cell;
+    vertical-align: middle;
+}
