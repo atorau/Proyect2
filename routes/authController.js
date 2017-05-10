@@ -180,5 +180,4 @@ authController.post('/signup', (req, res) => {
   });
 });
 
-
 module.exports = authController;
