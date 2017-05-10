@@ -10,9 +10,9 @@ const pictureSchema = new Schema({
     enum: ['PROFILE','ALBUMN','PRODUCT'],
     default: 'ALBUMN'
   },
-  albumm_id: {
+  albumn_id: {
     type: Schema.Types.ObjectId,
-    ref: "Albumm"
+    ref: "Albumn"
   },
   owner_id: {
     type: Schema.Types.ObjectId,

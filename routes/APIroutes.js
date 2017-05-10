@@ -23,12 +23,17 @@ const auth = require('../helpers/auth-helpers');
 
  //auth.ensureLoggedIn('/login'),
 APIroutes.get('/:route_id/trackname', (req, res, next) => {
-  Route.findById({_id:req.params.route_id}).populate("track").exec((err, route) => {
+  Route.findById({_id:req.params.route_id},(err, route) => {
     if (err) {
       res.status(500).json({message: err});
     } else {
-      console.log("hi",route.track.file_path);
-      res.status(200).json(route.track.file_path);
+      if(route.track!==undefined)
+      {
+        Track.populate(route,{path:"track"},(err,routeTrack)=>{
+          console.log("hi",route.track.file_path);
+          res.status(200).json(route.track.file_path);
+        });  
+      }
     }
   });
 
