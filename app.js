@@ -20,12 +20,14 @@ var authController = require('./routes/authController');
 var profileController = require('./routes/profileController');
 var routeController = require('./routes/routeController');
 var APIroutes = require('./routes/APIroutes');
+require("dotenv").config();
 
 var app = express();
 
 //Mongoose configuration
-mongoose.connect("mongodb://localhost:27017/proyecto-ironhack");
+// 
 
+mongoose.connect(process.env.MONGODB_URI);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
