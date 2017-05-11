@@ -19,6 +19,7 @@ const Track = require("../models/track");
 const passport = require("passport");
 
 const auth = require('../helpers/auth-helpers');
+const googleHelper = require('../helpers/google-api');
 
 // Bcrypt to encrypt passwords
 const bcrypt = require("bcrypt");
@@ -218,10 +219,31 @@ profileController.post('/profile/:user_id/delete',auth.ensureLoggedIn('/login'),
       }
       if(routes!==null){
         routes.forEach((route)=>{
-          Message.deleteMany({route_id: route._id},(err)=>{
+
+          let data = {
+            eventId: route.eventId,
+            calendarId: process.env.CALENDAR_ID,
+          };
+
+          googleHelper.deleteEventHelper(data,(err,event)=>{
             if(err){
-              next(err);
+              return next(err);
             }
+            Message.findOneAndRemove({routeOwner_id:route._id },(err,message)=>{
+              if(err){
+                return next(err);
+              }
+              Wall.findByIdAndUpdate({_id:message.wall_id},  {'$pull': {'messages': message._id }},{new:true},(err,wall)=>{
+                if(err){
+                  return next(err);
+                }
+                Message.deleteMany({route_id: route._id},(err)=>{
+                  if(err){
+                    next(err);
+                  }
+                });
+              });
+            });
           });
         });
       }

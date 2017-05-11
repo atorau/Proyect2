@@ -36,7 +36,19 @@ routeController.get('/routes/new', auth.ensureLoggedIn('/login'), (req, res, nex
 });
 
 routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next)=>{
-  console.log("hi1");
+
+  const name = req.body.name;
+  const ubication = req.body.ubication;
+  const date = req.body.date;
+  const description = req.body.description;
+
+  if (name === "" || ubication === ""|| date === ""||description === "" ) {
+    res.render("intranet/routes/edit",{route}, {
+      message: "Indicate name, ubication, date and description"
+    });
+    return;
+  }
+
   let data = {
     event:{
       'summary': req.body.name,
@@ -52,7 +64,6 @@ routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next
   };
   googleHelper.insertEventHelper(data,(err,event)=>{
     if(err){
-      console.log("hiError");
       return next(err);
     }
 
@@ -102,9 +113,10 @@ routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next
                 message: `${newRoute.name} para la fecha ${newRoute.date} con ubicacion ${newRoute.ubication}`,
                 owner_name: req.user.username,
                 owner_id: req.user.id,
+                routeOwner_id: route._id,
                 dest_id: undefined,
                 wall_id: wall._id,
-                messageType: "GLOBAL"
+                messageType: "ROUTE_GLOBAL"
               };
 
               Message.create(newMessage, (err, message) => {
@@ -160,29 +172,71 @@ routeController.get('/routes/:route_id/edit',auth.ensureLoggedIn('/login'), (req
 });
 
 routeController.post('/routes/:route_id/edit',auth.ensureLoggedIn('/login'), (req,res,next)=>{
+
   const name = req.body.name;
   const ubication = req.body.ubication;
   const date = req.body.date;
   const description = req.body.description;
+
   if (name === "" || ubication === ""|| date === ""||description === "" ) {
     res.render("intranet/routes/edit",{route}, {
       message: "Indicate name, ubication, date and description"
     });
     return;
   }
-  const editedRoute={
+
+  let editedRoute={
     name       :name,
     ubication  :ubication,
     date       :date,
     description:description
   };
+
   Route.findByIdAndUpdate({_id:req.params.route_id},editedRoute,{new:true}, (err, route)=>{
     if(err){
       next(err);
     }
-    Track.populate(route,{path: 'track'},(err,routeTrack)=>{
-      res.render('intranet/routes/edit',{route: routeTrack , message: "Route Edited", key: process.env.GOOGLE_KEY});
-      // res.redirect('/'+req.user.username+'/profile');
+    let data = {
+      event:{
+        'summary': req.body.name,
+        'location': req.body.ubication,
+        'start':{
+          'date': req.body.date
+        },
+        'end':{
+          'date': req.body.date
+        }
+      },
+      eventId: route.eventId,
+      calendarId: process.env.CALENDAR_ID,
+    };
+    googleHelper.updateEventHelper(data,(err,event)=>{
+      if(err){
+        return next(err);
+      }
+
+      Wall.findOne({wallType: 'GLOBAL'}, (err, wall) => {
+        if (err){
+          return next(err);
+        }
+        let editMessage = {
+          message: `${editedRoute.name} para la fecha ${editedRoute.date} con ubicacion ${editedRoute.ubication}`,
+        };
+        Message.findOneAndUpdate({routeOwner_id:route._id },editMessage, (err, message) => {
+          if (err) {
+            return next(err);
+          }
+          wall.save((err, updatedWall) => {
+            if (err) {
+              throw err;
+            }
+            Track.populate(route,{path: 'track'},(err,routeTrack)=>{
+              res.render('intranet/routes/edit',{route: routeTrack , message: "Route Edited", key: process.env.GOOGLE_KEY});
+              // res.redirect('/'+req.user.username+'/profile');
+            });
+          });
+        });
+      });
     });
   });
  });
@@ -191,71 +245,92 @@ routeController.post('/routes/:route_id/delete',auth.ensureLoggedIn('/login'), (
   console.log("hi");
   Route.findByIdAndRemove({_id:req.params.route_id},(err,route)=>{
     if(err){
-      next(err);
+      return next(err);
     }else{
-      Message.deleteMany({route_id:req.params.route_id},(err)=>{
+
+      let data = {
+        eventId: route.eventId,
+        calendarId: process.env.CALENDAR_ID,
+      };
+
+      googleHelper.deleteEventHelper(data,(err,event)=>{
         if(err){
-          next(err);
-        }else{
-          Albumn.findOneAndRemove({route_id:req.params.route_id},(err,albumn)=>{
+          return next(err);
+        }
+        Message.findOneAndRemove({routeOwner_id:route._id },(err,message)=>{
+          if(err){
+            return next(err);
+          }
+          Wall.findByIdAndUpdate({_id:message.wall_id},  {'$pull': {'messages': message._id }},{new:true},(err,wall)=>{
             if(err){
-              next(err);
-            }else{
-              Picture.find({albumn_id: albumn._id},(err,pictures)=>{
-                if(err){
-                  next(err);
-                }else{
-                  if(pictures!==null){
-                    pictures.forEach((picture)=>{
-                      fs.unlink(path.join(destDir, picture.pic_path), (err)=>{
-                        if(err){
-                          next(err);
-                        }else{
-                          picture.remove((err)=>{
-                            if(err){
-                              next(err);
-                            }
-                          });
-                        }
-                      });
-                    });
-                  }
-                  Track.findOneAndRemove({route_id:req.params.route_id},(err,track)=>{
-                    if(err){
-                      next(err);
-                    }else{
-                      if(track!==null)
-                      {
-                        fs.unlink(path.join(destDir, track.file_path), (err)=>{
-                          if(err){
-                            next(err);
-                          }else{
-                            User.findOneAndUpdate({_id:route.owner_id},{'$pull': {'routes': req.params.route_id, 'albumns': albumn._id,'tracks': track._id  }},{new:true},(err,user)=>{
+              return next(err);
+            }
+            Message.deleteMany({route_id:route._id},(err)=>{
+              if(err){
+                return next(err);
+              }else{
+                Albumn.findOneAndRemove({route_id:route._id},(err,albumn)=>{
+                  if(err){
+                    return next(err);
+                  }else{
+                    Picture.find({albumn_id: albumn._id},(err,pictures)=>{
+                      if(err){
+                        return next(err);
+                      }else{
+                        if(pictures!==null){
+                          pictures.forEach((picture)=>{
+                            fs.unlink(path.join(destDir, picture.pic_path), (err)=>{
                               if(err){
-                                next(err);
+                                return next(err);
                               }else{
-                                res.redirect(`/profile/${user._id}/show`);
+                                picture.remove((err)=>{
+                                  if(err){
+                                    return next(err);
+                                  }
+                                });
                               }
                             });
-                          }
-                        });
-                      }else{
-                        User.findOneAndUpdate({_id:route.owner_id},{'$pull': {'routes': req.params.route_id, 'albumns': albumn._id}},{new:true},(err,user)=>{
+                          });
+                        }
+                        Track.findOneAndRemove({route_id:route._id},(err,track)=>{
                           if(err){
-                            next(err);
-                          }
-                          else{
-                            res.redirect(`/profile/${user._id}/show`);
+                            return next(err);
+                          }else{
+                            if(track!==null)
+                            {
+                              fs.unlink(path.join(destDir, track.file_path), (err)=>{
+                                if(err){
+                                  return next(err);
+                                }else{
+                                  User.findOneAndUpdate({_id:route.owner_id},{'$pull': {'routes': route._id, 'albumns': albumn._id,'tracks': track._id  }},{new:true},(err,user)=>{
+                                    if(err){
+                                      return next(err);
+                                    }else{
+                                      return res.redirect(`/profile/${user._id}/show`);
+                                    }
+                                  });
+                                }
+                              });
+                            }else{
+                              User.findOneAndUpdate({_id:route.owner_id},{'$pull': {'routes': route._id, 'albumns': albumn._id}},{new:true},(err,user)=>{
+                                if(err){
+                                  return next(err);
+                                }
+                                else{
+                                  return res.redirect(`/profile/${user._id}/show`);
+                                }
+                              });
+                            }
                           }
                         });
                       }
-                    }
-                  });
-                }
-              });
-            }
+                    });
+                  }
+                });
+              }
+            });
           });
-        }
+        });
       });
     }
   });
@@ -437,7 +512,7 @@ routeController.get('/routes/:route_id/albumns/:albumn_id/edit',auth.ensureLogge
 routeController.get('/routes/:route_id/albumns/:albumn_id/pictures/:picture_id/delete',auth.ensureLoggedIn('/login'),(req,res, next)=>{
   console.log("req.params.picture_id",req.params.picture_id);
   //Albumn.findByIdAndUpdate({_id: req.params.albumn_id},{'$pull': {'pictures':{ '_id': req.params.picture_id }}},(err,albumn)=>{
-  Albumn.findByIdAndUpdate({_id: req.params.albumn_id},{'$pull': {'pictures': req.params.picture_id }},(err,albumn)=>{
+  Albumn.findByIdAndUpdate({_id: req.params.albumn_id},{'$pull': {'pictures': req.params.picture_id }},{new:true},(err,albumn)=>{
     if(err){
       next(err);
     }
