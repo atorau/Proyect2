@@ -20,6 +20,7 @@ var TOKEN_PATH = TOKEN_DIR + 'calendar-nodejs-quickstart.json';
  * @param {function} callback The callback to call with the authorized client.
  */
 function authorize(credentials, data, callback) {
+  console.log("hi9");
   var clientSecret = credentials.installed.client_secret;
   var clientId = credentials.installed.client_id;
   var redirectUrl = credentials.installed.redirect_uris[0];
@@ -28,6 +29,7 @@ function authorize(credentials, data, callback) {
 
   // Check if we have previously stored a token.
   fs.readFile(TOKEN_PATH, function(err, token) {
+    console.log("hi8");
     if (err) {
       getNewToken(oauth2Client, data, callback);
     } else {
@@ -46,6 +48,7 @@ function authorize(credentials, data, callback) {
  *     client.
  */
 function getNewToken(oauth2Client, data, callback) {
+  console.log("hi7");
   var authUrl = oauth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: SCOPES
@@ -75,6 +78,7 @@ function getNewToken(oauth2Client, data, callback) {
  * @param {Object} token The token to store to disk.
  */
 function storeToken(token) {
+  console.log("hi6");
   try {
     fs.mkdirSync(TOKEN_DIR);
   } catch (err) {
@@ -168,42 +172,28 @@ function storeToken(token) {
 //   },
 // };
 
-function insertEvent(auth,data,callback) {
-  var calendar = google.calendar('v3');
-  calendar.events.insert({
-    auth: auth,
-    //calendarId: 'primary',
-    //calendarId: 'scb42901388thsu2tbti76fie8@group.calendar.google.com',
-    calendarId: data.calendarId,
-    resource: data.event,
-  }, function(err, event) {
-    if (err) {
-      console.log('There was an error contacting the Calendar service: ' + err);
-      return;
-    }
-    console.log('Event created id: %s', event.id);
-    console.log('Event created: %s', event.htmlLink);
-    callback();
-  });
-}
+// function insertEvent(auth,data,callback) {
+//   console.log("hi10");
+//   var calendar = google.calendar('v3');
+//   calendar.events.insert({
+//     auth: auth,
+//     //calendarId: 'primary',
+//     //calendarId: 'scb42901388thsu2tbti76fie8@group.calendar.google.com',
+//     calendarId: data.calendarId,
+//     resource: data.event,
+//   }, function(err, event) {
+//     if (err) {
+//       console.log('There was an error contacting the Calendar service: ' + err);
+//       return callback(new Error('There was an error contacting the Calendar service: ' + err));
+//
+//     }
+//     console.log('Event created id: %s', event.id);
+//     console.log('Event created: %s', event.htmlLink);
+//     return callback(null,event);
+//   });
+// }
 
-function deleteEvent(auth,data,callback) {
-  var calendar = google.calendar('v3');
-  calendar.events.delete({
-    auth: auth,
-    //calendarId: 'scb42901388thsu2tbti76fie8@group.calendar.google.com',
-    calendarId: data.calendarId,
-    //eventId: "uaj26g2058mfmj99p6pov80pjg",
-    eventId: data.eventId
-  }, function(err, event) {
-    if (err) {
-      console.log('There was an error contacting the Calendar service: ' + err);
-      return;
-    }
-    console.log('Event erased: %s', event);
-    callback();
-  });
-}
+
 
 // var event = {
 //   'summary': 'Prueba UPDATE',
@@ -217,65 +207,78 @@ function deleteEvent(auth,data,callback) {
 //   },
 // };
 
-function updateEvent(auth,data,callback) {
-  var calendar = google.calendar('v3');
-  calendar.events.update({
-    auth: auth,
-    // calendarId: 'scb42901388thsu2tbti76fie8@group.calendar.google.com',
-    calendarId: data.calendarId,
-    //eventId: '5sfqbh5vtguabb3gdsrdlbj9kc',
-    eventId: data.eventId,
-    //resource: event,
-    resource: data.event
-  }, function(err, event) {
-    if (err) {
-      console.log('There was an error contacting the Calendar service: ' + err);
-      return;
-    }
-    console.log('Event created: %s', event.htmlLink);
-    callback();
-  });
-}
-
 module.exports = {
-  insertEventHelper: (data)=>{
-    return(req,res,next)=>{
-      // Load client secrets from a local file.
-      fs.readFile('client_secret.json', function processClientSecrets(err, content) {
-        if (err) {
-          console.log('Error loading client secret file: ' + err);
-          return;
-        }
-        // Authorize a client with the loaded credentials, then call the
-        // Google Calendar API.
-        authorize(JSON.parse(content), data, insertEvent);
-      });
-
-    };
-  },
-  deleteEventHelper: (data)=>{
+  insertEventHelper: (data,cb)=>{
     // Load client secrets from a local file.
     fs.readFile('client_secret.json', function processClientSecrets(err, content) {
       if (err) {
-        console.log('Error loading client secret file: ' + err);
-        return;
+        return cb(new Error('Error loading client secret file: ' + err));
       }
       // Authorize a client with the loaded credentials, then call the
       // Google Calendar API.
-      authorize(JSON.parse(content), data, deleteEvent);
+      authorize(JSON.parse(content), data, (auth,data,callback)=> {
+        var calendar = google.calendar('v3');
+        calendar.events.insert({
+          auth: auth,
+          calendarId: data.calendarId,
+          resource: data.event,
+        }, function(err, event) {
+          if (err) {
+            return cb(new Error('There was an error contacting the Calendar service: ' + err));
+          }
+          return cb(null,event);
+        });
+      });
     });
   },
-  updateEventHelper: (data)=>{
 
+  deleteEventHelper: (data,cb)=>{
     // Load client secrets from a local file.
     fs.readFile('client_secret.json', function processClientSecrets(err, content) {
       if (err) {
-        console.log('Error loading client secret file: ' + err);
-        return;
+        return cb(new Error('Error loading client secret file: ' + err));
       }
       // Authorize a client with the loaded credentials, then call the
       // Google Calendar API.
-      authorize(JSON.parse(content), data, updateEvent);
+      authorize(JSON.parse(content), data, (auth,data,callback)=> {
+        var calendar = google.calendar('v3');
+        calendar.events.delete({
+          auth: auth,
+          calendarId: data.calendarId,
+          eventId: data.eventId
+        }, function(err, event) {
+          if (err) {
+            return cb(new Error('There was an error contacting the Calendar service: ' + err));
+          }
+          return cb(null,event);
+        });
+      });
+    });
+  },
+
+  updateEventHelper: (data,cb)=>{
+    // Load client secrets from a local file.
+    fs.readFile('client_secret.json', function processClientSecrets(err, content) {
+      if (err) {
+        return cb(new Error('Error loading client secret file: ' + err));
+      }
+      // Authorize a client with the loaded credentials, then call the
+      // Google Calendar API.
+      authorize(JSON.parse(content), data, (auth,data,callback)=>{
+        var calendar = google.calendar('v3');
+        calendar.events.update({
+          auth: auth,
+          // calendarId: 'scb42901388thsu2tbti76fie8@group.calendar.google.com',
+          calendarId: data.calendarId,
+          eventId: data.eventId,
+          resource: data.event
+        }, function(err, event) {
+          if (err) {
+            return cb(new Error('There was an error contacting the Calendar service: ' + err));
+          }
+          return cb(null,event);
+        });
+      });
     });
   },
 };
