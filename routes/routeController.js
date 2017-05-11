@@ -72,16 +72,15 @@ routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next
       message: "Indicate name, ubication, date and description"
     });
   }
-
   let data = {
     event:{
       'summary': req.body.name,
       'location': req.body.ubication,
       'start':{
-        'date': req.body.date
+        'dateTime': moment(new Date(req.body.date)).startOf("day").add({hours:7})
       },
       'end':{
-        'date': req.body.date
+        'dateTime': moment(new Date(req.body.date)).startOf("day").add({hours:7})
       }
     },
     calendarId: process.env.CALENDAR_ID,
@@ -232,10 +231,10 @@ routeController.post('/routes/:route_id/edit',auth.ensureLoggedIn('/login'), (re
           'summary': req.body.name,
           'location': req.body.ubication,
           'start':{
-            'date': req.body.date
+            'dateTime': moment(new Date(req.body.date)).startOf("day").add({hours:7})
           },
           'end':{
-            'date': req.body.date
+            'dateTime': moment(new Date(req.body.date)).startOf("day").add({hours:7})
           }
         },
         eventId: route.eventId,
