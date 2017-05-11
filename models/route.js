@@ -10,7 +10,8 @@ const routeSchema = new Schema({
   comments: [{ type: Schema.Types.ObjectId, ref: "Message" }],
   albumn : { type: Schema.Types.ObjectId, ref: "Albumn" },
   date: Date,
-  track : { type: Schema.Types.ObjectId, ref: "Track" }
+  track : { type: Schema.Types.ObjectId, ref: "Track" },
+  eventId: String
 });
 
 const Route = mongoose.model("Route", routeSchema);

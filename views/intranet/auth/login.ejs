@@ -1,26 +1,85 @@
-<form action="/login" method="POST">
-  <div>
-    <label for="username">Username:</label>
-    <input type="text" name="username">
-  </div>
-  <div>
-    <label for="password">Password:</label>
-    <input type="password" name="password">
-  </div>
-  <% if (typeof(message) != "undefined") { %>
-    <div class="error-message">
-      <%= message %>
-    </div>
-    <% } %>
-      <div>
-        <input type="submit" value="Log In">
-      </div>
-</form>
 
-<p class="account-message">
-  <p>Don´t you have an account?<a href="/signup">Sign Up</a></p>
-  <br><b>
-  <a href="/logout">logout</a>
-  <br><br>
-  <a href="/">Home</a>
-</p>
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
+  <title>
+    Login
+  </title>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+          <div class="navbar-header">
+
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+               <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+            </button> <a class="navbar-brand" href="/">Private Area</a>
+          </div>
+
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+              <li class="active">
+                <a href="/">Home</a>
+              </li>
+              <li>
+                <a href="/history">History</a>
+              </li>
+              <li>
+                <a href="/calendar">Calendar</a>
+              </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Sections <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a class='Main' href="/main">Main</a></li>
+                  <li><a class='Profile' href="/">Profile</a></li>
+                  <li><a class='Routes' href="/">Routes</a></li>
+                  <li><a class='Edit' href="/">Edit your Profile</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a class='LogOut' href="/logout">Log Out</a></li>
+                </ul>
+              </li>
+          </div>
+        </nav>
+        <div class = "container">
+        	<div class="wrapper">
+        		<form action="/login" method="post" name="Login_Form" class="form-signin">
+        		    <h3 class="form-signin-heading">Welcome Back! Please Sign In</h3>
+        			  <hr class="colorgraph"><br>
+
+        			  <input type="text" class="form-control" name="username" placeholder="username"  autofocus="" required/>
+        			  <input type="password" class="form-control" name="password" placeholder="password" required/>
+                <% if (typeof(message) != "undefined") { %>
+                  <div class="error-message">
+                    <%= message %>
+                  </div>
+                  <% } %>
+
+
+        			  <button class="btn btn-lg btn-primary btn-block"  name="Submit" value="Login" type="Submit">Login</button>
+                <button class="btn btn-lg btn-primary btn-block"  name="Submit" onclick="window.location.href='/signup'" type="button">Signup</button>
+        		</form>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+</body>
+
+</html>

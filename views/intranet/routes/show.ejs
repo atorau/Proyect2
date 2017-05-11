@@ -1,40 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
+  <title>
+    <%= route.name %>
+  </title>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+               <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+            </button> <a class="navbar-brand" href="/">Private Area</a>
+          </div>
+
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+              <li class="active">
+                <a href="/">Home</a>
+              </li>
+              <li>
+                <a href="/history">History</a>
+              </li>
+              <li>
+                <a href="/calendar">Calendar</a>
+              </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Sections <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a class='Main' href="/">Main</a></li>
+                  <li><a class='Profile' href="/">Profile</a></li>
+                  <li><a class='Routes' href="/">Routes</a></li>
+                  <li><a class='Edit' href="/">Edit your Profile</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a class='LogOut' href="/logout">Log Out</a></li>
+                </ul>
+              </li>
+          </div>
+        </nav>
+        <div class="container-fluid">
+          <h1><%= route.name %></h1>
+          <hr style="color: black;" />
+          <br>
+          <div class="row">
+            <div class="row vertical-center-row">
+              <div class="text-center col-md-4 col-md-offset-4">
+            <% if(typeof(route.track) !== "undefined"){ %>
+
+                <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js">
+                </script>
+                <script
+                  src="https://maps.googleapis.com/maps/api/js?key=<%=key%>">
+                </script>
+                <script type="text/javascript" src="/javascripts/APIHandler.js"></script>
+                <script type="text/javascript" src="/javascripts/loadgpx.js"></script>
+                <script type="text/javascript" src="/javascripts/gpxviewer.js"></script>
+                <div class="track-route" route-id="<%= route._id %>" id="map" style="width: 30vw; height: 30vw;"></div>
+            <% } %>
+            <br><br>
+              </div>
+            </div>
+            <form action="/routes/<%= route._id %>/comments/new" method="POST" id="form-container">
+              <label for="comment">Message: </label>
+              <input id="comment" type="text" name="comment" placeholder="your comment here" required>
+              <br><br>
+              <button type="button" class="btn btn-primary">New comment</button>
+              <br><br>
+            </form>
+          </div>
+          <div class="row">
+            <div class="panel panel-default">
+              <div class="panel-heading">Here the wall of the route</div>
+              <div class="panel-body">
+                <p>Comment please</p>
+              </div>
+
+              <ul class="list-group">
+                <% if(route.comments.length){ %>
+                <%route.comments.forEach((comment)=>{ %>
+                <li class="list-group-item"><p><%= comment.message %></p></li>
+                <% }) %>
+              <% } %>
+              </ul>
+              <br><br>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                  <button type="button" class="btn btn-primary" onclick="window.location.href='/routes/<%=route._id%>/albumns/<%= route.albumn._id %>/show'">Albumn</button>
+                  <button type="button" class="btn btn-primary" onclick="window.location.href='/routes/<%= route._id %>/edit'">Edit</button>
+                  <button type="button" class="btn btn-primary" onclick="window.location.href='/main'">Home</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="justpushtobottom">
+    </div>
+
+    <footer class="footer2 p-t-1">
+      <div class="container">
+        <div class="pull-right">
+          <nav class="navbar" style="background:transparent; color: black;">
+            <nav class="nav navbar-nav pull-xs-left">
+
+              <a class="nav-item nav-link" href="https://www.youtube.com/watch?v=H1sXTmaqRHU">Wellcome to the Valhalla Titans!!</a>
+            </nav>
+          </nav>
+        </div>
+
+        <a href="https://www.facebook.com/mountainandcomedy/?fref=ts"><i class="fa fa-facebook fa-2x"></i></a>
+
+        <a href="https://twitter.com/mountain_comedy"><i class="fa fa-twitter fa-2x"></i></a>
+        <a href="https://www.instagram.com/mountainandcomedy/"><i class="fa fa-instagram fa-2x"></i></a>
+
+        <p class="h6">
+          Powered by Ironhack
+          <a href="http://www.ironhack.com" target="_blank"></a>
+        </p>
+      </div>
+    </footer>
+  </div>
 
 
-<h1><%= route.name %></h1>
+  </body>
 
-
-<% if(typeof(route.track) !== "undefined"){ %>
-    <section>
-      <h4><%= route.track.name %></h4>
-    </section>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js">
-    </script>
-    <script
-      src="https://maps.googleapis.com/maps/api/js?key=<%=key%>">
-    </script>
-    <script type="text/javascript" src="/javascripts/APIHandler.js"></script>
-    <script type="text/javascript" src="/javascripts/loadgpx.js"></script>
-    <script type="text/javascript" src="/javascripts/gpxviewer.js"></script>
-    <div class="track-route" route-id="<%= route._id %>" id="map" style="width: 45%; height: 45%;"></div>
-<% } %>
-
-<form action="/routes/<%= route._id %>/comments/new" method="POST" id="form-container">
-  <label for="comment">Message: </label>
-  <input id="comment" type="text" name="comment" placeholder="your comment here" required>
-  <br><br>
-  <button>New comment</button>
-</form>
-
-<h1>here comments</h1>
-
-<% if(route.comments.length){ %>
-  <%route.comments.forEach((comment)=>{ %>
-    <p><%= comment.message %></p>
-  <% }) %>
-<% } %>
-
-<a href="/routes/<%= route._id%>/albumns/<%= route.albumn._id %>/show">Albumn</a>
-<br><br>
-<a href="/routes/<%=route._id%>/edit">Edit this route</a>
-<br><br>
-<a href="/main">Home</a>
+  </html>

@@ -1,4 +1,3 @@
-/*jshint esversion: 6*/
 module.exports = {
   setCurrentUser: function(req, res, next) {
     if (req.isAuthenticated()) {

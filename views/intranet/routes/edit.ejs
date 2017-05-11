@@ -1,60 +1,184 @@
-<h2>Edit your Route</h2>
+<!DOCTYPE html>
+<html>
 
-<form action="/routes/<%= route._id%>/delete" method="POST" id="form-container">
-  <button>Delete this Route</button>
-</form>
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
+  <title>
+    NEW ROUTE
+  </title>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+          <div class="navbar-header">
 
-<form action="/routes/<%= route._id%>/edit" method="POST" id="form-container">
-  <label for="name">Name</label>
-  <input id="name" type="text" name="name" value="<%=route.name%>" required>
-  <br><br>
-  <label for="ubication">Ubication</label>
-  <input id="ubication" type="text" name="ubication" value="<%=route.ubication%>" required>
-  <br><br>
-  <label for="date">Date</label>
-  <input id="datenewroute" type="date" required name="date" value="">
-  <br><br>
-  <label for="description">Description</label>
-  <textarea name="description" rows="8" cols="80" value="<%= route.description%>" required> </textarea>
-  <br><br>
-  <button>Edit this Route</button>
-</form>
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+               <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+            </button> <a class="navbar-brand" href="/">Private Area</a>
+          </div>
 
-<% if(typeof(route.track) !== "undefined"){ %>
-    <section>
-      <h4><%= route.track.name %></h4>
-    </section>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js">
-    </script>
-    <script
-      src="https://maps.googleapis.com/maps/api/js?key=<%=key%>">
-    </script>
-    <script type="text/javascript" src="/javascripts/APIHandler.js"></script>
-    <script type="text/javascript" src="/javascripts/loadgpx.js"></script>
-    <script type="text/javascript" src="/javascripts/gpxviewer.js"></script>
-    <div class="track-route" route-id="<%= route._id %>" id="map" style="width: 45%; height: 45%;"></div>
-<% } %>
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+              <li class="active">
+                <a href="/">Home</a>
+              </li>
+              <li>
+                <a href="/history">History</a>
+              </li>
+              <li>
+                <a href="/calendar">Calendar</a>
+              </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Sections <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a class='Main' href="/">Main</a></li>
+                  <li><a class='Profile' href="/">Profile</a></li>
+                  <li><a class='Routes' href="/">Routes</a></li>
+                  <li><a class='Edit' href="/">Edit your Profile</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a class='LogOut' href="/logout">Log Out</a></li>
+                </ul>
+              </li>
+          </div>
+        </nav>
+        <div class="container-fluid">
+          <div class="col-md-6 ">
+            <div class="row">
+            <h2>Edit this Route</h2>
+            <hr style="color: black;" />
+            <br>
+            <form action="/routes/<%= route._id%>/edit" method="POST" id="form-container">
+              <div class="form-group row">
+                <label for="name" class="col-2 col-form-label">Name</label>
+                <div class="col-10">
+                  <input class="form-control" type="text" value="<%=route.name%>" id="name" name="name" required>
+                </div>
+              </div>
+              <div class="form-group row">
+                  <label for="ubication" class="col-2 col-form-label">Ubication</label>
+                  <div class="col-10">
+                    <input class="form-control" type="text" value="<%=route.ubication%>" id="ubication" name="ubication" required>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="date" class="col-2 col-form-label">Date</label>
+                  <div class="col-10">
+                    <input class="form-control" type="date" value="" id="datenewroute" name="date" required>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="description" class="col-2 col-form-label">Description</label>
+                  <div class="col-10">
+                    <textarea class="form-control" type="text"  rows="5" cols="80" value="<%= route.description%>" id="description" name="description"required></textarea>
+                    <br>
+                    <button type="submit" class="btn btn-primary btnEdit" >Edit Route</button>
+                  </div>
+                </div>
+              </form>
+              </div>
+                <div class="row buttonEdit">
+                      <button type="button" class="btn btn-primary btnEdit" onclick="window.location.href='/main'">Home</button>
+                      <form  action="/routes/<%= route._id%>/delete" method="POST" id="form-container" >
+                        <button class="btn btn-primary btnEdit">Delete this Route</button>
+                      </form>
+                </div>
+            </div>
+            <div class="col-md-6 " align="center">
+              <% if(typeof(route.track) !== "undefined"){ %>
+                  <section>
+                    <h4><%= route.track.name %></h4>
+                  </section>
+                  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js">
+                  </script>
+                  <script
+                    src="https://maps.googleapis.com/maps/api/js?key=<%=key%>">
+                  </script>
+                  <script type="text/javascript" src="/javascripts/APIHandler.js"></script>
+                  <script type="text/javascript" src="/javascripts/loadgpx.js"></script>
+                  <script type="text/javascript" src="/javascripts/gpxviewer.js"></script>
+                  <div class="track-route" route-id="<%= route._id %>" id="map" style="width: 30vw; height: 30vw;"></div>
+              <% } %>
 
-  <section>
-    <h2>Change your Track File</h2>
-    <form class="track-route" route-id="<%= route._id %>" action="/routes/<%= route._id %>/tracks/new" method="post" enctype="multipart/form-data">
-      <input type="file" name="track">
-      <input type="submit" value="Save">
-    </form>
-  </section>
+              <div class="row buttonEdit">
 
-  <%if(typeof(route.track)!=='undefined'){%>
-  <section>
-    <h2>Delete Track File</h2>
-    <form action="/routes/<%= route._id %>/tracks/<%= route.track._id %>/delete" method="post">
-      <button type="submit">Delete Track</button>
-    </form>
-  </section>
-  <%}%>
+              </div>
+              <div class="row">
+                  <section>
+                    <h5>Change your Track File</h5>
+
+                    <form class="track-route" route-id="<%= route._id %>" action="/routes/<%= route._id %>/tracks/new" method="post" enctype="multipart/form-data">
+                      <label for="file-upload" class="btn btn-primary">
+                        <i class="fa fa-cloud-upload"></i> Custom Upload
+                    </label>
+                      <input id="file-upload" type="file" name="track">
+                      <input class="btn btn-primary"  type="submit" value="Save">
+                      <br><br>
+                    </form>
+                  </section>
+                  <%if(typeof(route.track)!=='undefined'){%>
+                    <section>
+                      <form action="/routes/<%= route._id %>/tracks/<%= route.track._id %>/delete" method="post">
+                        <button type="submit" class="btn btn-primary btnEdit">Delete Track</button>
+                      </form>
+                    </section>
+                    <%}%>
+                    <br>
+                    <button type="button" class="btn btn-primary btnEdit" onclick="window.location.href='/routes/<%=route._id%>/show'">See your route <%=route.name%></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+        <div id="justpushtobottom">
+        </div>
+
+        <footer class="footer2 p-t-1">
+          <div class="container">
+            <div class="pull-right">
+              <nav class="navbar" style="background:transparent; color: black;">
+                <nav class="nav navbar-nav pull-xs-left">
+
+                  <a class="nav-item nav-link" href="https://www.youtube.com/watch?v=H1sXTmaqRHU">Wellcome to the Valhalla Titans!!</a>
+                </nav>
+              </nav>
+            </div>
+
+            <a href="https://www.facebook.com/mountainandcomedy/?fref=ts"><i class="fa fa-facebook fa-2x"></i></a>
+
+            <a href="https://twitter.com/mountain_comedy"><i class="fa fa-twitter fa-2x"></i></a>
+            <a href="https://www.instagram.com/mountainandcomedy/"><i class="fa fa-instagram fa-2x"></i></a>
+
+            <p class="h6">
+              Powered by Ironhack
+              <a href="http://www.ironhack.com" target="_blank"></a>
+            </p>
+          </div>
+        </footer>
+      </div>
+
+
+      </body>
+
+      </html>
 
 
 
-  <a href="/routes/<%=route._id%>/show">See your route <%=route.name%></a>
+
+
+
+
+
+
 
 
   <script src="/jquery/dist/jquery.min.js"></script>
