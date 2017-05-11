@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 
@@ -31,20 +30,20 @@
                   <a href="/">Home</a>
                 </li>
                 <li>
-                  <a href="/calendar">Calendar</a>
+                  <a href="/history">History</a>
                 </li>
                 <li>
-                  <a href="/main">Main</a>
+                  <a href="/calendar">Calendar</a>
                 </li>
               </ul>
               <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Sections <span class="caret"></span></a>
                   <ul class="dropdown-menu">
-                    <li><a class='Main' href="/main">Main</a></li>
-                    <li><a class='Profile' href="/main">Profile</a></li>
-                    <li><a class='Routes' href="/main">Routes</a></li>
-                    <li><a class='Edit' href="/main">Edit your Profile</a></li>
+                    <li><a class='Main' href="/">Main</a></li>
+                    <li><a class='Profile' href="/">Profile</a></li>
+                    <li><a class='Routes' href="/">Routes</a></li>
+                    <li><a class='Edit' href="/">Edit your Profile</a></li>
                     <li role="separator" class="divider"></li>
                     <li><a class='LogOut' href="/logout">Log Out</a></li>
                   </ul>
@@ -55,116 +54,72 @@
             <h1>NEW ROUTE</h1>
             <hr style="color: black;" />
             <br>
+            <form action="/routes/new" method="POST" id="form-container">
+              <div class="form-group row">
+                <label for="name" class="col-2 col-form-label">Name</label>
+                <div class="col-10">
+                  <input class="form-control" type="text" value="Here the name of the new route" id="name" name="name" required>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="ubication" class="col-2 col-form-label">Ubication</label>
+                <div class="col-10">
+                  <input class="form-control" type="text" value="Tuiza de Arriba" id="ubication" name="ubication" required>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="date" class="col-2 col-form-label">Date</label>
+                <div class="col-10">
+                  <input class="form-control" type="date" value="2017-08-19" id="datenewroute" name="date" required>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="description" class="col-2 col-form-label">Description</label>
+                <div class="col-10">
+                  <textarea class="form-control" type="text"  rows="5" cols="80" value="Write the description of the route" id="description" name="description"required></textarea>
+                </div>
+              </div>
+
+              <button class="btn btn-primary">Create Route</button>
+              <br><br>
+              <button type="button" class="btn btn-primary" onclick="window.location.href='/main'">Home</button>
+            </form>
+          </div>
+          <div class="row">
+          </div>
+        </div>
+      </div>
+      <div id="justpushtobottom">
+      </div>
+
+      <footer class="footer2 p-t-1">
+        <div class="container">
+          <div class="pull-right">
+            <nav class="navbar" style="background:transparent; color: black;">
+              <nav class="nav navbar-nav pull-xs-left">
+
+                <a class="nav-item nav-link" href="https://www.youtube.com/watch?v=H1sXTmaqRHU">Wellcome to the Valhalla Titans!!</a>
+              </nav>
+            </nav>
+          </div>
+
+          <a href="https://www.facebook.com/mountainandcomedy/?fref=ts"><i class="fa fa-facebook fa-2x"></i></a>
+
+          <a href="https://twitter.com/mountain_comedy"><i class="fa fa-twitter fa-2x"></i></a>
+          <a href="https://www.instagram.com/mountainandcomedy/"><i class="fa fa-instagram fa-2x"></i></a>
+
+          <p class="h6">
+            Powered by Ironhack
+            <a href="http://www.ironhack.com" target="_blank"></a>
+          </p>
+        </div>
+      </footer>
+    </div>
+
+    <script src="/jquery/dist/jquery.min.js"></script>
+    <script src="/jquery-ui/jquery-ui.min.js"></script>
+    <script src="/javascripts/dateinput.js"></script>
+    </body>
 
 
-<h1>NEW ROUTE</h1>
-<form action="/routes/new" method="POST" id="form-container">
-  <label for="name">Name</label>
-  <input id="name" type="text" name="name" placeholder="" required>
-  <br><br>
-  <label for="ubication">Ubication</label>
-  <input id="ubication" type="text" name="ubication" placeholder="" required>
-  <br><br>
-  <label for="date">Date</label>
-  <input id="datenewroute" type="date" name="date" placeholder="" required>
-  <br><br>
-  <label for="description">Description</label>
-  <textarea name="description" rows="8" cols="80" placeholder="Write the description of the route" required> </textarea>
-  <br><br>
-
-  <button>Create Route</button>
-
-  <p class="account-message">
-    <a href="/">Home</a>
-  </p>
-
-  <p class="account-message">
-    <a href="/logout">Logout</a>
-  </p>
-</form>
-
-
-<script src="/jquery/dist/jquery.min.js"></script>
-<script src="/jquery-ui/jquery-ui.min.js"></script>
-<script src="/javascripts/dateinput.js"></script>
-
-
-
-<div class="form-group row">
-  <label for="example-text-input" class="col-2 col-form-label">Text</label>
-  <div class="col-10">
-    <input class="form-control" type="text" value="Artisanal kale" id="example-text-input">
-  </div>
-</div>
-<div class="form-group row">
-  <label for="example-search-input" class="col-2 col-form-label">Search</label>
-  <div class="col-10">
-    <input class="form-control" type="search" value="How do I shoot web" id="example-search-input">
-  </div>
-</div>
-<div class="form-group row">
-  <label for="example-email-input" class="col-2 col-form-label">Email</label>
-  <div class="col-10">
-    <input class="form-control" type="email" value="bootstrap@example.com" id="example-email-input">
-  </div>
-</div>
-<div class="form-group row">
-  <label for="example-url-input" class="col-2 col-form-label">URL</label>
-  <div class="col-10">
-    <input class="form-control" type="url" value="https://getbootstrap.com" id="example-url-input">
-  </div>
-</div>
-<div class="form-group row">
-  <label for="example-tel-input" class="col-2 col-form-label">Telephone</label>
-  <div class="col-10">
-    <input class="form-control" type="tel" value="1-(555)-555-5555" id="example-tel-input">
-  </div>
-</div>
-<div class="form-group row">
-  <label for="example-password-input" class="col-2 col-form-label">Password</label>
-  <div class="col-10">
-    <input class="form-control" type="password" value="hunter2" id="example-password-input">
-  </div>
-</div>
-<div class="form-group row">
-  <label for="example-number-input" class="col-2 col-form-label">Number</label>
-  <div class="col-10">
-    <input class="form-control" type="number" value="42" id="example-number-input">
-  </div>
-</div>
-<div class="form-group row">
-  <label for="example-datetime-local-input" class="col-2 col-form-label">Date and time</label>
-  <div class="col-10">
-    <input class="form-control" type="datetime-local" value="2011-08-19T13:45:00" id="example-datetime-local-input">
-  </div>
-</div>
-<div class="form-group row">
-  <label for="example-date-input" class="col-2 col-form-label">Date</label>
-  <div class="col-10">
-    <input class="form-control" type="date" value="2011-08-19" id="example-date-input">
-  </div>
-</div>
-<div class="form-group row">
-  <label for="example-month-input" class="col-2 col-form-label">Month</label>
-  <div class="col-10">
-    <input class="form-control" type="month" value="2011-08" id="example-month-input">
-  </div>
-</div>
-<div class="form-group row">
-  <label for="example-week-input" class="col-2 col-form-label">Week</label>
-  <div class="col-10">
-    <input class="form-control" type="week" value="2011-W33" id="example-week-input">
-  </div>
-</div>
-<div class="form-group row">
-  <label for="example-time-input" class="col-2 col-form-label">Time</label>
-  <div class="col-10">
-    <input class="form-control" type="time" value="13:45:00" id="example-time-input">
-  </div>
-</div>
-<div class="form-group row">
-  <label for="example-color-input" class="col-2 col-form-label">Color</label>
-  <div class="col-10">
-    <input class="form-control" type="color" value="#563d7c" id="example-color-input">
-  </div>
-</div>
+    </html>
