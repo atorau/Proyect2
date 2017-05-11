@@ -16,6 +16,8 @@
     <script type="text/javascript" src="/javascripts/loadgpx.js"></script>
     <script type="text/javascript" src="/javascripts/gpxviewer.js"></script>
     <div class="track-route" route-id="<%= route._id %>" id="map" style="width: 45%; height: 45%;"></div>
+
+    <p><a href="/routes/<%=route._id%>/tracks/<%=route.track._id%>/dowload">Download Track</a></p>
 <% } %>
 
 <form action="/routes/<%= route._id %>/comments/new" method="POST" id="form-container">

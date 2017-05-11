@@ -15,6 +15,10 @@ const messageSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "User"
   },
+  routeOwner_id: {
+    type: Schema.Types.ObjectId,
+    ref: "Route"
+  },
   route_id: {
     type: Schema.Types.ObjectId,
     ref: "Route"
@@ -29,7 +33,7 @@ const messageSchema = new Schema({
   },
   messageType: {
     type: String,
-    enum: ['GLOBAL', 'WALL','CONVERSATION','ROUTE'],
+    enum: ['GLOBAL', 'WALL','CONVERSATION','ROUTE','ROUTE_GLOBAL'],
     default: 'GLOBAL'
   }
 },{timestamps: {

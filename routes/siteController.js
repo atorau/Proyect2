@@ -61,7 +61,7 @@ siteController.post('/:wall_id/messages/new', auth.ensureLoggedIn('/login'), (re
     let newMessage = {
       message: req.body.wallText,
       owner_name: req.user.username,
-      owner_id: req.user,
+      owner_id: req.user.id,
       dest_id: undefined,
       wall_id: req.params.wall_id,
       messageType: "GLOBAL"
@@ -80,8 +80,6 @@ siteController.post('/:wall_id/messages/new', auth.ensureLoggedIn('/login'), (re
       });
     });
   });
-
-
 });
 
 module.exports = siteController;

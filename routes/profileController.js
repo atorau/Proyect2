@@ -2,10 +2,24 @@
 // routes/auth-routes.js
 const express = require("express");
 const profileController = express.Router();
-const multer = require('multer');
-var upload = multer({
-  dest: "./public/uploads"
+
+const multer = require('multer')({
+  dest: "./public/uploads",
+  fileFilter: (req, file, cb) => {
+    var filetypes = /jpeg|jpg|png/;
+    var mimetype = filetypes.test(file.mimetype);
+    var extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    if (mimetype && extname) {
+      return cb(null, true);
+    }
+    req.fileValidationError = 'goes wrong on the mimetype';
+    cb(new Error("Error: File upload only supports the following filetypes - " + filetypes));
+  }
 });
+
+var pictureUpload = multer.single('photo');
+
+
 const Picture = require("../models/picture");
 
 // User model
@@ -19,6 +33,7 @@ const Track = require("../models/track");
 const passport = require("passport");
 
 const auth = require('../helpers/auth-helpers');
+const googleHelper = require('../helpers/google-api');
 
 // Bcrypt to encrypt passwords
 const bcrypt = require("bcrypt");
@@ -30,36 +45,51 @@ const path = require('path');
 let destDir = path.join(__dirname, '../public');
 //////////////////////////////////////////////////////////////
 
-profileController.post('/profile/:user_id/pictures/upload', upload.single('photo'), (req, res, next)=>{
+// profileController.post('/profile/:user_id/pictures/upload', auth.ensureLoggedIn('/login'), upload.single('photo'), (req, res, next)=>{
 
-  let newPicture ={
-    name: req.body.name,
-    pictureType: 'PROFILE',
-    albumn_id: undefined,
-    owner_id: req.params.user_id,
-    pic_path: `/uploads/${req.file.filename}`,
-    pic_name: req.file.originalname
-  };
+profileController.post('/profile/:user_id/pictures/upload', auth.ensureLoggedIn('/login'), (req, res, next)=>{
+
+  if(req.user.id!=req.params.user_id){
+    return res.redirect('/main');
+  }
 
   User.findById({_id: req.params.user_id }).populate("picture").exec((err,userPicture)=>{
     if(err){
-      next(err);
+      return next(err);
     }
-    fs.unlink(path.join(destDir, userPicture.picture.pic_path), (err)=>{
-      if(err){
-        next(err);
+
+    pictureUpload(req, res, (err)=>{
+      if (err)
+      {
+        return res.render('intranet/users/edit',{user: userPicture , message: "Not accepted format"});
       }
-      else {
-        Picture.findByIdAndUpdate(userPicture.picture._id, newPicture ,{new:true}, (err,picture)=>{
-          userPicture.picture = picture._id;
-          userPicture.save((err, userUpdated)=>{
-            if(err){
-              next(err);
-            }
-              Picture.populate(userUpdated,{path: 'picture'},(err,userPicture)=>{
-              res.render('intranet/users/edit',{user: userUpdated , message: "Picture changed"});
+      if(req.file!== undefined){
+        let newPicture ={
+          name: req.body.name,
+          pictureType: 'PROFILE',
+          albumn_id: undefined,
+          owner_id: req.params.user_id,
+          pic_path: `/uploads/${req.file.filename}`,
+          pic_name: req.file.originalname
+        };
+
+        fs.unlink(path.join(destDir, userPicture.picture.pic_path), (err)=>{
+          if(err){
+            return next(err);
+          }
+          else {
+            Picture.findByIdAndUpdate(userPicture.picture._id, newPicture ,{new:true}, (err,picture)=>{
+              userPicture.picture = picture._id;
+              userPicture.save((err, userUpdated)=>{
+                if(err){
+                  return next(err);
+                }
+                  Picture.populate(userUpdated,{path: 'picture'},(err,userPicture)=>{
+                  res.render('intranet/users/edit',{user: userUpdated , message: "Picture changed"});
+                });
+              });
             });
-          });
+          }
         });
       }
     });
@@ -72,16 +102,16 @@ profileController.get('/profile/:user_id/show', auth.ensureLoggedIn('/login'), (
     _id: req.params.user_id
   }).populate('picture').exec((err, user) => {
     if (err) {
-      next(err);
+      return next(err);
     }
     if (user.routes.length === 0) {
       Wall.findOne({
         _id: user.wall
       }).populate('messages').exec((err, wall) => {
         if (err) {
-          next(err);
+          return next(err);
         }
-        res.render('intranet/users/profile', {
+        return res.render('intranet/users/profile', {
           user,
           wall
         });
@@ -94,9 +124,9 @@ profileController.get('/profile/:user_id/show', auth.ensureLoggedIn('/login'), (
           _id: user.wall
         }).populate('messages').exec((err, wall) => {
           if (err) {
-            next(err);
+            return next(err);
           }
-          res.render('intranet/users/profile', {
+          return res.render('intranet/users/profile', {
             user,
             wall
           });
@@ -119,17 +149,17 @@ profileController.post('/profile/:user_id/walls/:wall_id/messages/new', auth.ens
 
   User.findById({_id: req.params.user_id}).populate('wall').exec((err, userwall) => {
     if(err){
-      next(err);
+      return next(err);
     }
     else{
       Message.create(newMessage, (err, message) => {
         if (err) {
-          next(err);
+          return next(err);
         }else{
           userwall.wall.messages.push(message);
           userwall.wall.save((err, updatedWall) => {
             if (err) {
-              next (err);
+              return next (err);
             }else{
               return res.redirect('/profile/'+ userwall._id+'/show');
             }
@@ -141,15 +171,25 @@ profileController.post('/profile/:user_id/walls/:wall_id/messages/new', auth.ens
 });
 
 profileController.get('/profile/:user_id/edit' , auth.ensureLoggedIn('/login'), (req,res,next)=>{
+
+  if(req.user.id!=req.params.user_id){
+    return res.redirect('/main');
+  }
+
   User.findById({_id: req.params.user_id }).populate("picture").exec ((err, user)=>{
     if(err){
-      next(err);
+      return next(err);
     }
-    res.render('intranet/users/edit',{user});
+    return res.render('intranet/users/edit',{user:user});
   });
 });
 
 profileController.post('/profile/:user_id/edit',auth.ensureLoggedIn('/login'),(req,res,next)=>{
+
+  if(req.user.id!=req.params.user_id){
+    return res.redirect('/main');
+  }
+
   const username = req.body.username;
   const name = req.body.name;
   const lastName = req.body.lastName;
@@ -159,23 +199,28 @@ profileController.post('/profile/:user_id/edit',auth.ensureLoggedIn('/login'),(r
   const ubication = req.body.ubication;
   const address = req.body.address;
   if (username === "" || name === ""|| lastName === ""|| email === ""|| ubication === ""|| address === "" || password === "" ) {
-    res.render("intranet/users/edit",{user}, {
-      message: "Indicate username, email, password and role"
+    User.findById({_id: req.params.user_id }).populate("picture").exec ((err, user)=>{
+      if(err){
+        return next(err);
+      }
+      return res.render("intranet/users/edit",{user:user,
+        message: "Indicate username, email, password and role"
+      });
     });
-    return;
   }
   User.find({$or:[{username:username},{email:email}]}, "username email", (err, users) => {
     if(err){
       next(err);
     }
-    User.findById({_id:req.params.user_id},(err,userEdited)=>{
+    User.findById({_id:req.params.user_id}).populate("picture").exec((err,userEdited)=>{
       if(err){
         next(err);
       }
       if (users.length){
         users.forEach((user)=>{
           if(user._id != userEdited._id && (userEdited.username === user.username|| userEdited.email === user.email)){
-            res.render("intranet/users/edit", {
+            console.log("HI2");
+            res.render("intranet/users/edit", {user: userEdited,
               message: "The username or email already exists"
             });
             return;
@@ -201,6 +246,7 @@ profileController.post('/profile/:user_id/edit',auth.ensureLoggedIn('/login'),(r
         next(err);
       }
       Picture.populate(user,{path: 'picture'},(err,userPicture)=>{
+        console.log("HI2");
         res.render('intranet/users/edit',{user: userPicture , message: "User Edited"});
       });
     });
@@ -208,56 +254,81 @@ profileController.post('/profile/:user_id/edit',auth.ensureLoggedIn('/login'),(r
 });
 //not good with async
 profileController.post('/profile/:user_id/delete',auth.ensureLoggedIn('/login'),(req,res,next)=>{
+  if(req.user.id!=req.params.user_id){
+    return res.redirect('/main');
+  }
+
   User.findByIdAndRemove({_id:req.params.user_id},(err,user)=>{
     if(err){
-      next(err);
+      return next(err);
     }
     Route.find({owner_id:user._id},(err,routes)=>{
       if(err){
-        next(err);
+        return next(err);
       }
       if(routes!==null){
         routes.forEach((route)=>{
-          Message.deleteMany({route_id: route._id},(err)=>{
+
+          let data = {
+            eventId: route.eventId,
+            calendarId: process.env.CALENDAR_ID,
+          };
+
+          googleHelper.deleteEventHelper(data,(err,event)=>{
             if(err){
-              next(err);
+              return next(err);
             }
+            Message.findOneAndRemove({routeOwner_id:route._id },(err,message)=>{
+              if(err){
+                return next(err);
+              }
+              Wall.findByIdAndUpdate({_id:message.wall_id},  {'$pull': {'messages': message._id }},{new:true},(err,wall)=>{
+                if(err){
+                  return next(err);
+                }
+                Message.deleteMany({route_id: route._id},(err)=>{
+                  if(err){
+                    return next(err);
+                  }
+                });
+              });
+            });
           });
         });
       }
       Route.deleteMany({owner_id:user._id},(err)=>{
         if(err){
-          next(err);
+          return next(err);
         }
         Albumn.deleteMany({owner_id:user._id},(err)=>{
           if(err){
-            next(err);
+            return next(err);
           }
           Wall.findOne({owner_id:user._id},(err,wall)=>{
             if(err){
-              next(err);
+              return next(err);
             }
             Message.deleteMany({wall_id: wall._id },(err)=>{
               if(err){
-                next(err);
+                return next(err);
               }
               wall.remove((err, pictureRemoved)=>{
                 if(err){
-                  next(err);
+                  return next(err);
                 }
                 Picture.find({owner_id: user._id},(err,pictures)=>{
                   if(err){
-                    next(err);
+                    return next(err);
                   }
                   if(pictures!==null){
                     pictures.forEach((picture)=>{
                       fs.unlink(path.join(destDir, picture.pic_path), (err)=>{
                         if(err){
-                          next(err);
+                          return next(err);
                         }else{
                           picture.remove((err, pictureRemoved)=>{
                             if(err){
-                              next(err);
+                              return next(err);
                             }
                           });
                         }
@@ -266,24 +337,24 @@ profileController.post('/profile/:user_id/delete',auth.ensureLoggedIn('/login'),
                   }
                   Track.find({owner_id: user._id},(err,tracks)=>{
                     if(err){
-                      next(err);
+                      return next(err);
                     }
                     if(tracks!==null){
                       tracks.forEach((track)=>{
                         fs.unlink(path.join(destDir, track.file_path), (err)=>{
                           if(err){
-                            next(err);
+                            return next(err);
                           }else{
                             track.remove((err)=>{
                               if(err){
-                                next(err);
+                                return next(err);
                               }
                             });
                           }
                         });
                       });
                     }
-                    res.redirect(`/main`);
+                    return res.redirect(`/main`);
                   });
                 });
               });
