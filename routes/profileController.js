@@ -97,13 +97,13 @@ profileController.post('/profile/:user_id/pictures/upload', auth.ensureLoggedIn(
 });
 
 profileController.get('/profile/:user_id/show', auth.ensureLoggedIn('/login'), (req, res, next) => {
-
   User.findById({
     _id: req.params.user_id
   }).populate('picture').exec((err, user) => {
     if (err) {
       return next(err);
     }
+
     if (user.routes.length === 0) {
       Wall.findOne({
         _id: user.wall

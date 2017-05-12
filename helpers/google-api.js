@@ -3,6 +3,12 @@ var fs = require('fs');
 var readline = require('readline');
 var google = require('googleapis');
 var googleAuth = require('google-auth-library');
+require("dotenv").config();
+
+var configJson={"installed":{"client_id":process.env.CLIENT_ID,"project_id":process.env.PROJECT_ID,"auth_uri":process.env.AUTH_URI,"token_uri":process.env.TOKEN_URI,"auth_provider_x509_cert_url":process.env.AUTH_PROVIDER,"client_secret":process.env.CLIENT_SECRET,"redirect_uris":[process.env.REDIRECT_URIS_ONE,process.env.REDIRECT_URIS_ONE]}};
+
+var config =require('json-configurator')(configJson,'prod');
+
 
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/calendar-nodejs-quickstart.json
@@ -99,7 +105,7 @@ function storeToken(token) {
 module.exports = {
   insertEventHelper: (data,cb)=>{
     // Load client secrets from a local file.
-    fs.readFile('client_secret.json', function processClientSecrets(err, content) {
+    fs.readFile("client_secret.json", function processClientSecrets(err, content) {
       if (err) {
         return cb(new Error('Error loading client secret file: ' + err));
       }
@@ -123,7 +129,7 @@ module.exports = {
 
   deleteEventHelper: (data,cb)=>{
     // Load client secrets from a local file.
-    fs.readFile('client_secret.json', function processClientSecrets(err, content) {
+    fs.readFile("client_secret.json", function processClientSecrets(err, content) {
       if (err) {
         return cb(new Error('Error loading client secret file: ' + err));
       }
@@ -147,7 +153,7 @@ module.exports = {
 
   updateEventHelper: (data,cb)=>{
     // Load client secrets from a local file.
-    fs.readFile('client_secret.json', function processClientSecrets(err, content) {
+    fs.readFile("client_secret.json", function processClientSecrets(err, content) {
       if (err) {
         return cb(new Error('Error loading client secret file: ' + err));
       }

@@ -43,9 +43,9 @@
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Sections <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                   <li><a class='Main' href="/main">Main</a></li>
-                  <li><a class='Profile' href="/">Profile</a></li>
-                  <li><a class='Routes' href="/">Routes</a></li>
-                  <li><a class='Edit' href="/">Edit your Profile</a></li>
+                  <li><a class='Profile' href="/profile/<%=currentUser._id%>/show">Profile</a></li>
+                  <li><a class='Routes' href="/routes/index">Routes</a></li>
+                  <li><a class='Edit' href="/profile/<%=currentUser._id%>/edit">Edit your Profile</a></li>
                   <li role="separator" class="divider"></li>
                   <li><a class='LogOut' href="/logout">Log Out</a></li>
                 </ul>
@@ -58,7 +58,7 @@
               <%  if(typeof(user.picture)!== "undefined"){ %>
 
 
-              <section>
+              <section >
                   <img src="<%= user.picture.pic_path %>" alt="<%= user.picture.pic_name %>" />
                   <br><br>
               </section>
@@ -82,37 +82,7 @@
             <% }%>
           </div>
           <div class="col-md-6">
-            <form action="/profile/<%=user._id%>/edit" method='POST'>
-
-              <label for='username'>username</label>
-              <input type='text' name='username' id='username' required value=<%=user.username%>>
-              <br>
-              <label for='name'>Name</label>
-              <input type='text' name='name' id='name' required value=<%=user.name%>>
-              <br>
-              <label for='lastName'>Last Name</label>
-              <input type='text' name='lastName' id='lastName' required value=<%=user.lastName%>>
-              <br>
-              <label for='email'>Email</label>
-              <input type='text' name='email' id='email' required value=<%=user.email%>>
-              <br>
-              <label for='ubication'>Ubication</label>
-              <input type='text' name='ubication' id='ubication' required value=<%=user.ubication%>>
-              <br>
-              <label for='address'>Address</label>
-              <input type='text' name='address' id='address' required value=<%=user.address%>>
-              <br>
-              <label for='password'>Password</label>
-              <input type='password' name='password' id='password' required>
-              <br>
-
-              <button type='sumbit'>edit user</button>
-            </form>
-
-
-
-
-            <form action="/<%=user._id%>/edit" method="POST" id="form-container">
+            <form action="/profile/<%=user._id%>/edit" method="POST" id="form-container">
               <div class="form-group row">
                 <label for="username" class="col-2 col-form-label">User Name</label>
                 <div class="col-10">
@@ -156,29 +126,45 @@
                 </div>
               </div>
 
-              <button type="sumbit" class="btn btn-primary">Edit User</button>
+              <button type="submit" class="btn btn-primary">Edit User</button>
               <br><br>
-              <button type="button" class="btn btn-primary" onclick="window.location.href='/main'">Home</button>
+              <button type="button" class="btn btn-primary" onclick="window.location.href='/profile/<%=currentUser._id%>/show'">Profile</button>
             </form>
 
 
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+  <div id="justpushtobottom">
+  </div>
 
-  <label for='email'>Email</label>
-  <input type='text' name='email' id='email' required value=<%=user.email%>>
-  <br>
-  <label for='ubication'>Ubication</label>
-  <input type='text' name='ubication' id='ubication' required value=<%=user.ubication%>>
-  <br>
-  <label for='address'>Address</label>
-  <input type='text' name='address' id='address' required value=<%=user.address%>>
-  <br>
-  <label for='password'>Password</label>
-  <input type='password' name='password' id='password' required>
-  <br>
+  <footer class="footer2 p-t-1">
+    <div class="container">
+      <div class="pull-right">
+        <nav class="navbar" style="background:transparent; color: black;">
+          <nav class="nav navbar-nav pull-xs-left">
 
-  <button type='sumbit'>edit user</button>
-</form>
+            <a class="nav-item nav-link" href="https://www.youtube.com/watch?v=H1sXTmaqRHU">Wellcome to the Valhalla Titans!!</a>
+          </nav>
+        </nav>
+      </div>
 
-<a href="/main">Main</a>
+      <a href="https://www.facebook.com/mountainandcomedy/?fref=ts"><i class="fa fa-facebook fa-2x"></i></a>
+
+      <a href="https://twitter.com/mountain_comedy"><i class="fa fa-twitter fa-2x"></i></a>
+      <a href="https://www.instagram.com/mountainandcomedy/"><i class="fa fa-instagram fa-2x"></i></a>
+
+      <p class="h6">
+        Powered by Ironhack
+        <a href="http://www.ironhack.com" target="_blank"></a>
+      </p>
+    </div>
+  </footer>
+</div>
+
+
+</body>
+
+</html>
