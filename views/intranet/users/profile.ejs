@@ -47,9 +47,9 @@
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Sections <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                   <li><a class='Main' href="/main">Main</a></li>
-                  <li><a class='Profile' href="/profile/<%=user._id%>/show">Profile</a></li>
+                  <li><a class='Profile' href="/profile/<%=currentUser._id%>/show">Profile</a></li>
                   <li><a class='Routes' href="/routes/index">Routes</a></li>
-                  <li><a class='Edit' href="/profile/<%=user._id%>/edit">Edit your Profile</a></li>
+                  <li><a class='Edit' href="/profile/<%=currentUser._id%>/edit">Edit your Profile</a></li>
                   <li role="separator" class="divider"></li>
                   <li><a class='LogOut' href="/logout">Log Out</a></li>
                 </ul>
@@ -133,6 +133,7 @@
               </form>
               <div class="row" align="center">
                 <button type="button" class="btn btn-primary" onclick="window.location.href='/routes/index'">See All the routes</button>
+                <button type="button" class="btn btn-primary" onclick="window.location.href='/routes/new'">New Route</button>
                 <button type="button" class="btn btn-primary" onclick="window.location.href='/profile/<%=user._id%>/edit'">Edit your profile</button>
               </div>
             </div>

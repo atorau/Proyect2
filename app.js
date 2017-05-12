@@ -25,7 +25,7 @@ require("dotenv").config();
 var app = express();
 
 //Mongoose configuration
-// 
+//
 
 mongoose.connect(process.env.MONGODB_URI);
 // view engine setup
