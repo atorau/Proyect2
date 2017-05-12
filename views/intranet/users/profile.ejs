@@ -131,10 +131,10 @@
                 <button type="submit" class="btn btn-primary">New message</button>
                 <br><br>
               </form>
-              <div class="row" align="center">
+              <div class="row">
                 <button type="button" class="btn btn-primary" onclick="window.location.href='/routes/index'">See All the routes</button>
-                <button type="button" class="btn btn-primary" onclick="window.location.href='/routes/new'">New Route</button>
                 <%if(currentUser.id == user._id ){%>
+                <button type="button" class="btn btn-primary" onclick="window.location.href='/routes/new'">New Route</button>
                 <button type="button" class="btn btn-primary" onclick="window.location.href='/profile/<%=user._id%>/edit'">Edit your profile</button>
               <%}%>
               </div>
