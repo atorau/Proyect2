@@ -25,14 +25,16 @@ const auth = require('../helpers/auth-helpers');
 APIroutes.get('/:route_id/trackname', (req, res, next) => {
   Route.findById({_id:req.params.route_id},(err, route) => {
     if (err) {
+      console.log("entra error");
       res.status(500).json({message: err});
     } else {
       if(route.track!==undefined)
       {
+        console.log("entra ok");
         Track.populate(route,{path:"track"},(err,routeTrack)=>{
           console.log("hi",route.track.file_path);
           res.status(200).json(route.track.file_path);
-        });  
+        });
       }
     }
   });
