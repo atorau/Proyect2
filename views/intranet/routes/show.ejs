@@ -76,8 +76,10 @@
               <label for="comment">Message: </label>
               <input id="comment" type="text" name="comment" placeholder="your comment here" required>
               <br><br>
-              <button type="button" class="btn btn-primary">New comment</button>
+              <button type="submit" class="btn btn-primary">New comment</button>
+              <% if(typeof(route.track) !== "undefined"){ %>
               <button type="button" class="btn btn-primary" onclick="window.location.href='/routes/<%=route._id%>/tracks/<%=route.track._id%>/dowload'">Download Track</button>
+              <% } %>
               <br><br>
             </form>
           </div>
@@ -101,7 +103,9 @@
           <div class="row">
             <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                   <button type="button" class="btn btn-primary" onclick="window.location.href='/routes/<%=route._id%>/albumns/<%= route.albumn._id %>/show'">Albumn</button>
+                <%  if(currentUser.id == route.owner_id){ %>
                   <button type="button" class="btn btn-primary" onclick="window.location.href='/routes/<%= route._id %>/edit'">Edit</button>
+                <%}%>
                   <button type="button" class="btn btn-primary" onclick="window.location.href='/main'">Home</button>
             </div>
           </div>

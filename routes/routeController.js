@@ -547,13 +547,6 @@ routeController.post('/routes/:route_id/tracks/:track_id/delete',(req,res,next)=
 
 routeController.get('/routes/:route_id/tracks/:track_id/dowload',auth.ensureLoggedIn('/login'),(req,res,next)=>{
   console.log("hi to downoad----------------------");
-  Route.findById({_id:req.params.route_id},(err,secureRoute)=>{
-    if(err){
-      return next(err);
-    }
-    if(req.user.id != secureRoute.owner_id){
-      return res.redirect("/main");
-    }
 
     Track.findById({_id:req.params.track_id},(err,track)=>{
       if(err){
@@ -562,8 +555,6 @@ routeController.get('/routes/:route_id/tracks/:track_id/dowload',auth.ensureLogg
       console.log("hi to downoad2----------------------");
       res.download(path.join(destDir, track.file_path),track.file_name);
     });
-  });
-
 });
 
 routeController.get('/routes/:route_id/albumns/:albumn_id/show',auth.ensureLoggedIn('/login'),(req,res, next)=>{
