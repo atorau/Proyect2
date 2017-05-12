@@ -1,5 +1,5 @@
-const routeAPI = new APIHandler("http://localhost:3000/apiRoutes");
-// const routeAPI = new APIHandler("http://mountainandcomedy.herokuapp.com/apiRoutes");
+// const routeAPI = new APIHandler("http://localhost:3000/apiRoutes");
+const routeAPI = new APIHandler("http://mountainandcomedy.herokuapp.com/apiRoutes");
 
 $(document).ready(function() {
   var mapOptions = {
