@@ -184,6 +184,75 @@ profileController.get('/profile/:user_id/edit' , auth.ensureLoggedIn('/login'), 
   });
 });
 
+// profileController.post('/profile/:user_id/edit',auth.ensureLoggedIn('/login'),(req,res,next)=>{
+//
+//   if(req.user.id!=req.params.user_id){
+//     return res.redirect('/main');
+//   }
+//
+//   const username = req.body.username;
+//   const name = req.body.name;
+//   const lastName = req.body.lastName;
+//   const email = req.body.email;
+//   const password = req.body.password;
+//   // const role = ((req.user.role === 'ADMIN')? 'ADMIN':'USER');
+//   const ubication = req.body.ubication;
+//   const address = req.body.address;
+//   if (username === "" || name === ""|| lastName === ""|| email === ""|| ubication === ""|| address === "" || password === "" ) {
+//     User.findById({_id: req.params.user_id }).populate("picture").exec ((err, user)=>{
+//       if(err){
+//         return next(err);
+//       }
+//       return res.render("intranet/users/edit",{user:user,
+//         message: "Indicate username, email, password and role"
+//       });
+//     });
+//   }
+//   User.find({$or:[{username:username},{email:email}]}, "username email", (err, users) => {
+//     if(err){
+//       next(err);
+//     }
+//     User.findById({_id:req.params.user_id}).populate("picture").exec((err,userEdited)=>{
+//       if(err){
+//         next(err);
+//       }
+//       if (users.length){
+//         users.forEach((user)=>{
+//           if(user._id != userEdited._id && (userEdited.username === user.username|| userEdited.email === user.email)){
+//             console.log("HI2");
+//             res.render("intranet/users/edit", {user: userEdited,
+//               message: "The username or email already exists"
+//             });
+//             return;
+//           }
+//         });
+//       }
+//     });
+//     const salt = bcrypt.genSaltSync(bcryptSalt);
+//     const hashPass = bcrypt.hashSync(password, salt);
+//
+//     const editedUser = {
+//       username: username,
+//       name: name,
+//       lastName: lastName,
+//       email: email,
+//       password: hashPass,
+//       ubication: ubication,
+//       address: address
+//     };
+//
+//     User.findByIdAndUpdate({_id:req.params.user_id},editedUser,{new:true}, (err, user)=>{
+//       if(err){
+//         next(err);
+//       }
+//       Picture.populate(user,{path: 'picture'},(err,userPicture)=>{
+//         console.log("HI2");
+//         res.render('intranet/users/edit',{user: userPicture , message: "User Edited"});
+//       });
+//     });
+//   });
+// });
+//not good with async
 profileController.post('/profile/:user_id/edit',auth.ensureLoggedIn('/login'),(req,res,next)=>{
 
   if(req.user.id!=req.params.user_id){
@@ -208,26 +277,19 @@ profileController.post('/profile/:user_id/edit',auth.ensureLoggedIn('/login'),(r
       });
     });
   }
-  User.find({$or:[{username:username},{email:email}]}, "username email", (err, users) => {
-    if(err){
-      next(err);
+
+
+  User.count({$or:[{username:username},{email:email}]},(err,count)=>{
+    if(err)
+    {
+      return next(err);
     }
-    User.findById({_id:req.params.user_id}).populate("picture").exec((err,userEdited)=>{
-      if(err){
-        next(err);
-      }
-      if (users.length){
-        users.forEach((user)=>{
-          if(user._id != userEdited._id && (userEdited.username === user.username|| userEdited.email === user.email)){
-            console.log("HI2");
-            res.render("intranet/users/edit", {user: userEdited,
-              message: "The username or email already exists"
-            });
-            return;
-          }
-        });
-      }
-    });
+    if(count>1){
+      return res.render("intranet/users/edit", {user: userEdited,
+        message: "The username or email already exists"
+      });
+    }
+
     const salt = bcrypt.genSaltSync(bcryptSalt);
     const hashPass = bcrypt.hashSync(password, salt);
 
@@ -238,21 +300,33 @@ profileController.post('/profile/:user_id/edit',auth.ensureLoggedIn('/login'),(r
       email: email,
       password: hashPass,
       ubication: ubication,
-      address: address
+      address: address,
     };
 
     User.findByIdAndUpdate({_id:req.params.user_id},editedUser,{new:true}, (err, user)=>{
       if(err){
         next(err);
       }
+      //req.user = user;
       Picture.populate(user,{path: 'picture'},(err,userPicture)=>{
         console.log("HI2");
-        res.render('intranet/users/edit',{user: userPicture , message: "User Edited"});
+        console.log("req.user",req.user);
+        console.log("user",user);
+        console.log("userPicture",userPicture);
+        return res.render('intranet/users/edit',{user: userPicture , message: "User Edited"});
       });
     });
   });
 });
-//not good with async
+
+
+
+
+
+
+
+
+
 profileController.get('/profile/:user_id/delete',auth.ensureLoggedIn('/login'),(req,res,next)=>{
   if(req.user.id!=req.params.user_id){
     return res.redirect('/main');
