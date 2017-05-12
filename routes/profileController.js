@@ -253,41 +253,53 @@ profileController.post('/profile/:user_id/edit',auth.ensureLoggedIn('/login'),(r
   });
 });
 //not good with async
-profileController.post('/profile/:user_id/delete',auth.ensureLoggedIn('/login'),(req,res,next)=>{
+profileController.get('/profile/:user_id/delete',auth.ensureLoggedIn('/login'),(req,res,next)=>{
   if(req.user.id!=req.params.user_id){
     return res.redirect('/main');
   }
-
+  console.log("entra aqui1");
   User.findByIdAndRemove({_id:req.params.user_id},(err,user)=>{
     if(err){
+      console.log("entra aqui2");
       return next(err);
     }
+    console.log("entra aqui3");
     Route.find({owner_id:user._id},(err,routes)=>{
       if(err){
+        console.log("entra aqui4");
         return next(err);
       }
+      console.log("entra aqui5");
       if(routes!==null){
+        console.log("entra aqui6");
         routes.forEach((route)=>{
-
+          console.log("entra aqui7");
           let data = {
             eventId: route.eventId,
             calendarId: process.env.CALENDAR_ID,
           };
-
+          console.log("entra aqui8");
           googleHelper.deleteEventHelper(data,(err,event)=>{
             if(err){
+              console.log("entra aqui9");
               return next(err);
             }
+            console.log("entra aqui10");
             Message.findOneAndRemove({routeOwner_id:route._id },(err,message)=>{
               if(err){
+                console.log("entra aqui11");
                 return next(err);
               }
+              console.log("entra aqui12");
               Wall.findByIdAndUpdate({_id:message.wall_id},  {'$pull': {'messages': message._id }},{new:true},(err,wall)=>{
                 if(err){
+                  console.log("entra aqui13");
                   return next(err);
                 }
+                console.log("entra aqui14");
                 Message.deleteMany({route_id: route._id},(err)=>{
                   if(err){
+                    console.log("entra aqui15");
                     return next(err);
                   }
                 });
@@ -296,38 +308,56 @@ profileController.post('/profile/:user_id/delete',auth.ensureLoggedIn('/login'),
           });
         });
       }
+      console.log("entra aqui16");
       Route.deleteMany({owner_id:user._id},(err)=>{
         if(err){
+          console.log("entra aqui17");
           return next(err);
         }
+        console.log("entra aqui18");
         Albumn.deleteMany({owner_id:user._id},(err)=>{
           if(err){
+            console.log("entra aqui19");
             return next(err);
           }
+          console.log("entra aqui20");
           Wall.findOne({owner_id:user._id},(err,wall)=>{
             if(err){
+              console.log("entra aqui21");
               return next(err);
             }
+            console.log("entra aqui22");
             Message.deleteMany({wall_id: wall._id },(err)=>{
               if(err){
+                console.log("entra aqui23");
                 return next(err);
               }
+              console.log("entra aqui24");
               wall.remove((err, pictureRemoved)=>{
                 if(err){
+                  console.log("entra aqui25");
                   return next(err);
                 }
+                console.log("entra aqui26");
                 Picture.find({owner_id: user._id},(err,pictures)=>{
                   if(err){
+                    console.log("entra aqui27");
                     return next(err);
                   }
+                  console.log("entra aqui28");
                   if(pictures!==null){
+                    console.log("entra aqui29");
                     pictures.forEach((picture)=>{
+                      console.log("entra aqui30");
                       fs.unlink(path.join(destDir, picture.pic_path), (err)=>{
                         if(err){
+                          console.log("entra aqui31");
                           return next(err);
                         }else{
+                          console.log("entra aqui32");
                           picture.remove((err, pictureRemoved)=>{
                             if(err){
+                              console.log("entra aqui33");
                               return next(err);
                             }
                           });
@@ -335,18 +365,26 @@ profileController.post('/profile/:user_id/delete',auth.ensureLoggedIn('/login'),
                       });
                     });
                   }
+                  console.log("entra aqui34");
                   Track.find({owner_id: user._id},(err,tracks)=>{
                     if(err){
+                      console.log("entra aqui35");
                       return next(err);
                     }
+                    console.log("entra aqui36");
                     if(tracks!==null){
+                      console.log("entra aqui37");
                       tracks.forEach((track)=>{
+                        console.log("entra aqui38");
                         fs.unlink(path.join(destDir, track.file_path), (err)=>{
                           if(err){
+                            console.log("entra aqui39");
                             return next(err);
                           }else{
+                            console.log("entra aqui40");
                             track.remove((err)=>{
                               if(err){
+                                console.log("entra aqui41");
                                 return next(err);
                               }
                             });
@@ -354,6 +392,7 @@ profileController.post('/profile/:user_id/delete',auth.ensureLoggedIn('/login'),
                         });
                       });
                     }
+                    console.log("entra aqui42");
                     return res.redirect(`/main`);
                   });
                 });
