@@ -113,7 +113,7 @@
                   <%if(typeof(wall)!=='undefined'){%>
                     <% if(wall.messages.length){ %>
                       <% wall.messages.forEach((message)=>{%>
-                        <li class="list-group-item"><p><%=message.message%></p></li>
+                        <li class="list-group-item"><p><u><%=message.owner_username%></u> --> <%=message.message%></p></li>
                       <%})%>
                     <%}%>
                   <%}%>
