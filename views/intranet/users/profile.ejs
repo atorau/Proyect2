@@ -134,7 +134,7 @@
               <div class="row" align="center">
                 <button type="button" class="btn btn-primary" onclick="window.location.href='/routes/index'">See All the routes</button>
                 <button type="button" class="btn btn-primary" onclick="window.location.href='/routes/new'">New Route</button>
-                <%if(currentUser.id !== user._id ){%>
+                <%if(currentUser.id == user._id ){%>
                 <button type="button" class="btn btn-primary" onclick="window.location.href='/profile/<%=user._id%>/edit'">Edit your profile</button>
               <%}%>
               </div>
