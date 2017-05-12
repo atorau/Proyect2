@@ -10,15 +10,10 @@ var configJson={"installed":{"client_id":process.env.CLIENT_ID,"project_id":proc
 var config =require('json-configurator')(configJson,'prod');
 
 const path = require('path');
-let destDir = path.join(__dirname, '/credentials/');
 
-
-// If modifying these scopes, delete your previously saved credentials
-// at ~/.credentials/calendar-nodejs-quickstart.json
 var SCOPES = ['https://www.googleapis.com/auth/calendar','https://www.googleapis.com/auth/calendar.readonly'];
-var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
-    process.env.USERPROFILE) + '/.credentials/';
-var TOKEN_PATH = TOKEN_DIR + 'calendar-nodejs-quickstart.json';
+var TOKEN_DIR =  path.join(__dirname, '../credentials/');
+var TOKEN_PATH = TOKEN_DIR + 'proyecto-ironhack.json';
 
 
 /**
