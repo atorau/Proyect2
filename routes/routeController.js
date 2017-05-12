@@ -584,7 +584,7 @@ routeController.post('/routes/:route_id/tracks/new', auth.ensureLoggedIn('/login
               _id: route.track._id
             });
 
-            Track.findByIdAndUpdate({_id:routeTrack.track._id}, newTrack ,{new:true}, (err,track)=>{
+            Track.findByIdAndUpdate({_id:route.track._id}, newTrack ,{new:true}, (err,track)=>{
               if(err){
                 return next(err);
               }
@@ -603,7 +603,7 @@ routeController.post('/routes/:route_id/tracks/new', auth.ensureLoggedIn('/login
                     if(err){
                       return next(err);
                     }
-                    return res.render('intranet/routes/edit',{route: routeTrack, key: process.env.GOOGLE_KEY});
+                    return res.render('intranet/routes/edit',{route: route, key: process.env.GOOGLE_KEY});
                   });
                 });
               });
