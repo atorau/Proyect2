@@ -9,6 +9,9 @@ var configJson={"installed":{"client_id":process.env.CLIENT_ID,"project_id":proc
 
 var config =require('json-configurator')(configJson,'prod');
 
+const path = require('path');
+let destDir = path.join(__dirname, '/credentials/');
+
 
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/calendar-nodejs-quickstart.json
