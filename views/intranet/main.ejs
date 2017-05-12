@@ -73,7 +73,7 @@
             <div class="col-md-6" align="center">
               <h1>Mountain&Comedy Calendar</h1>
 
-              <iframe src="https://calendar.google.com/calendar/embed?src=nuceqp41qsq8d85b5hahe1bpbs%40group.calendar.google.com&ctz=Europe/Madrid" style="border: 0" width="450vw" height="450vw" frameborder="0" scrolling="no"></iframe>
+              <iframe src="https://calendar.google.com/calendar/embed?src=nuceqp41qsq8d85b5hahe1bpbs%40group.calendar.google.com&ctz=Europe/Madrid" style="border: 0" class="mi-iframe" width="450vw" height="450vw" frameborder="0" scrolling="no"></iframe>
             </div>
 
 
@@ -88,12 +88,22 @@
 
                 <ul class="list-group">
                   <%if(typeof(wall)!=='undefined'){%>
-                    <% if(wall.messages.length){ %>
-                      <% wall.messages.forEach((message)=>{%>
-                        <li class="list-group-item"><p><%=message.message%></p></li>
-                      <%})%>
-                    <%}%>
-                  <%}%>
+                     <% if(wall.messages.length){ %>
+                       <% wall.messages.forEach((message)=>{%>
+                         <li>
+                             <%if(typeof(message.routeOwner_id)!=='undefined'){%>
+                               <p>
+                                 <u><%=message.owner_username%></u> --> <%=message.message%>
+                               </p>
+                             <% }else{%>
+                               <p>
+                                 <u><%=message.owner_username%></u> --> <%=message.message%>
+                               </p>
+                             <% } %>
+                         </li>
+                         <%})%>
+                       <%}%>
+                     <%}%>
                 </ul>
                 <br><br>
               </div>

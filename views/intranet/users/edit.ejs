@@ -65,7 +65,7 @@
             <% } %>
 
 
-              <%if (currentUser.username === user.username){ %>
+              <%if (currentUser.id == user._id){ %>
                 <section>
                   <form class="track-route" action="/profile/<%=user._id%>/pictures/upload" method="post" enctype="multipart/form-data">
                     <label for="file-upload" class="btn btn-primary">

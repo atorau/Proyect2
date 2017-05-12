@@ -93,7 +93,7 @@
               <ul class="list-group">
                 <% if(route.comments.length){ %>
                 <%route.comments.forEach((comment)=>{ %>
-                <li class="list-group-item"><p><%= comment.message %></p></li>
+                <li class="list-group-item"><p><u><%=comment.owner_username%></u>--> <%=comment.message%></p></li>
                 <% }) %>
               <% } %>
               </ul>

@@ -60,6 +60,108 @@ routeController.get('/routes/new', auth.ensureLoggedIn('/login'), (req, res, nex
   res.render('intranet/routes/new');
 });
 
+// routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next)=>{
+//
+//   const name = req.body.name;
+//   const ubication = req.body.ubication;
+//   const date = req.body.date;
+//   const description = req.body.description;
+//
+//   if (name === "" || ubication === ""|| date === ""||description === "" ) {
+//     return res.render("intranet/routes/edit",{route}, {
+//       message: "Indicate name, ubication, date and description"
+//     });
+//   }
+//   let data = {
+//     event:{
+//       'summary': req.body.name,
+//       'location': req.body.ubication,
+//       'start':{
+//         'dateTime': moment(new Date(req.body.date)).startOf("day").add({hours:7})
+//       },
+//       'end':{
+//         'dateTime': moment(new Date(req.body.date)).startOf("day").add({hours:7})
+//       }
+//     },
+//     calendarId: process.env.CALENDAR_ID,
+//   };
+//   googleHelper.insertEventHelper(data,(err,event)=>{
+//     if(err){
+//       return next(err);
+//     }
+//
+//     let newRoute= {
+//       name:req.body.name,
+//       ubication: req.body.ubication,
+//       date:req.body.date,
+//       description:req.body.description,
+//       owner_id: req.user.id,
+//       comments:[],
+//       albumn: undefined,
+//       track:undefined,
+//       eventId: event.id
+//     };
+//     Route.create(newRoute,(err, route)=>{
+//       if(err){
+//         return next(err);
+//       }
+//       let newAlbumn={
+//         title: route.name,
+//         pictures:[],
+//         route_id: route._id,
+//         owner_id: route.owner_id,
+//       };
+//       Albumn.create(newAlbumn, (err, albumn)=>{
+//         if(err){
+//           return next(err);
+//         }
+//         route.albumn = albumn._id;
+//         route.save((err, routeUpdated)=>{
+//           if(err){
+//             return next(err);
+//           }
+//           req.user.routes.push(route);
+//           req.user.albumns.push(albumn);
+//           req.user.save((err,userUpdated)=>{
+//             if(err){
+//               return next(err);
+//             }
+//
+//             Wall.findOne({wallType: 'GLOBAL'}, (err, wall) => {
+//               if (err){
+//                 return next(err);
+//               }
+//
+//               let newMessage = {
+//                 message: `${newRoute.name} para la fecha ${newRoute.date} con ubicacion ${newRoute.ubication}`,
+//                 owner_name: req.user.username,
+//                 owner_id: req.user.id,
+//                 routeOwner_id: route._id,
+//                 dest_id: undefined,
+//                 wall_id: wall._id,
+//                 messageType: "ROUTE_GLOBAL"
+//               };
+//
+//               Message.create(newMessage, (err, message) => {
+//                 if (err) {
+//                   return next(err);
+//                 }
+//                 wall.messages.push(message);
+//                 wall.save((err, updatedWall) => {
+//                   if (err) {
+//                     return next(err);
+//                   }
+//                   return res.redirect('/routes/'+ route._id+ '/show');
+//                   // res.redirect('/main');
+//                 });
+//               });
+//             });
+//           });
+//         });
+//       });
+//     });
+//   });
+// });
 routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next)=>{
 
   const name = req.body.name;
@@ -68,10 +170,11 @@ routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next
   const description = req.body.description;
 
   if (name === "" || ubication === ""|| date === ""||description === "" ) {
-    return res.render("intranet/routes/edit",{route}, {
+    return res.render("intranet/routes/new",{
       message: "Indicate name, ubication, date and description"
     });
   }
+
   let data = {
     event:{
       'summary': req.body.name,
@@ -134,7 +237,7 @@ routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next
 
               let newMessage = {
                 message: `${newRoute.name} para la fecha ${newRoute.date} con ubicacion ${newRoute.ubication}`,
-                owner_name: req.user.username,
+                owner_username: req.user.username,
                 owner_id: req.user.id,
                 routeOwner_id: route._id,
                 dest_id: undefined,
@@ -163,6 +266,14 @@ routeController.post('/routes/new',auth.ensureLoggedIn('/login'),(req, res, next
   });
 });
 
+
+
+
+
+
+
+
+///////////////////////////////////////
 routeController.get('/routes/index',auth.ensureLoggedIn('/login'),(req, res, next)=>{
   Route.find({}, (err,routes)=>{
     if(err){
