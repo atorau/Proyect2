@@ -103,7 +103,9 @@
           <div class="row">
             <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                   <button type="button" class="btn btn-primary" onclick="window.location.href='/routes/<%=route._id%>/albumns/<%= route.albumn._id %>/show'">Albumn</button>
+                <%  if(currentUser.id !==route.owner_id){ %>
                   <button type="button" class="btn btn-primary" onclick="window.location.href='/routes/<%= route._id %>/edit'">Edit</button>
+                <%}%>
                   <button type="button" class="btn btn-primary" onclick="window.location.href='/main'">Home</button>
             </div>
           </div>
