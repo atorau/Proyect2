@@ -21,7 +21,7 @@
     "express-session": "^1.15.2",
     "flash": "^1.1.0",
     "google-auth-library": "^0.10.0",
-    "googleapis": "^19.0.0",
+    "googleapis": "^59.0.0",
     "json-configurator": "^1.0.1",
     "moment": "^2.18.1",
     "mongodb": "^2.2.26",
