@@ -24,7 +24,7 @@
     "googleapis": "^19.0.0",
     "json-configurator": "^1.0.1",
     "moment": "^2.18.1",
-    "mongodb": "^2.2.26",
+    "mongodb": "^3.6.1",
     "mongoose": "^4.9.7",
     "morgan": "~1.9.1",
     "multer": "^1.3.0",
